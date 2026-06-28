@@ -2,6 +2,8 @@
 
 A full-featured clinic management web application built with **ASP.NET Core MVC (.NET 10)**. Patients can book appointments, pay online, and leave reviews. Doctors manage their schedules. Admins oversee the entire system from a centralized dashboard.
 
+<img width="1532" height="705" alt="image" src="https://github.com/user-attachments/assets/8bf64728-70ce-4d01-9561-4c4ee1cabd4e" />
+
 ---
 
 ## ✨ Features
@@ -135,7 +137,6 @@ ClinicFlow/
 ---
 
 ## Images
-<img width="1532" height="705" alt="image" src="https://github.com/user-attachments/assets/8bf64728-70ce-4d01-9561-4c4ee1cabd4e" />
 
 <img width="1535" height="765" alt="image" src="https://github.com/user-attachments/assets/7d347527-339c-4ed8-94d4-b3c5470f9aba" />
 
