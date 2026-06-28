@@ -96,13 +96,7 @@ Clinic_System.DAL  →  Data Access Layer   (Entities, Repositories, DbContext)
    dotnet ef database update
    ```
 
-4. **Install frontend dependencies**
-   ```bash
-   npm install
-   npm run build
-   ```
-
-5. **Run the app**
+4. **Run the app**
    ```bash
    dotnet run
    ```
