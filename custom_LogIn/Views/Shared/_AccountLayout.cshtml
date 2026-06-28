@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="winter">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>@ViewData["Title"] - ClinicFlow</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- نقلنا السكربت للـ Head لضمان تطبيق الثيم قبل تحميل المحتوى -->
+    <script>
+        // دالة تغيير الثيم وحفظها
+        function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        }
+
+        // تطبيق الثيم فوراً من LocalStorage
+        const savedTheme = localStorage.getItem('theme') || 'winter';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        body {
+
+        font-family: 'Inter', sans-serif;
+        }
+        .page-bg {
+        background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.10), transparent 25%), radial-gradient(circle at top right, rgba(14, 165, 233, 0.10), transparent 25%), radial-gradient(circle at bottom center, rgba(96, 165, 250, 0.08), transparent 30%);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-base-100 flex flex-col page-bg">
+    
+    <header class="w-full">
+        <partial name="_AccountNavbar" />
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-4 md:p-12 w-full">
+        <div class="w-full">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="w-full">
+        <partial name="_AccountFooter" />
+    </footer>
+@await RenderSectionAsync("Scripts", required: false)
+    @await Html.PartialAsync("_NotificationPartial")
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+﻿@model Clinic_System.PagedResult<Clinic_System.AppointmentDto>
+@using Clinic_System
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "My Appointments";
+    var currentPage = Model?.PageNumber ?? 1;
+    var totalPages = Model == null || Model.PageSize == 0 ? 1
+                      : (int)Math.Ceiling((double)(Model.TotalCount) / Model.PageSize);
+}
+
+<div class="space-y-5">
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-xl font-black tracking-tight">📅 My Appointments</h1>
+            <p class="text-xs opacity-40 mt-0.5">
+                @(Model?.TotalCount ?? 0) total appointment@(Model?.TotalCount != 1 ? "s" : "")
+            </p>
+        </div>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-error rounded-xl text-sm border-0">⚠️ @TempData["Error"]</div>
+    }
+
+    @if (Model == null || !Model.Items.Any())
+    {
+        <div class="flex flex-col items-center justify-center py-24 opacity-30 space-y-3">
+            <div class="text-6xl">📭</div>
+            <p class="text-base font-semibold">No appointments yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="overflow-x-auto rounded-2xl border border-base-200/60 bg-base-100/60 backdrop-blur shadow-sm">
+            <table class="table table-sm w-full">
+                <thead>
+                    <tr class="text-xs uppercase opacity-40 border-b border-base-200">
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th class="text-center">Paid</th>
+                        <th class="text-right">Fee</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.Items)
+                    {
+                        var (badge, label) = a.Status switch
+                        {
+                            AppointmentStatus.Confirmed => ("badge-success", "Confirmed"),
+                            AppointmentStatus.Pending => ("badge-warning", "Pending"),
+                            AppointmentStatus.Completed => ("badge-info", "Completed"),
+                            AppointmentStatus.Canceled => ("badge-error", "Cancelled"),
+                            _ => ("badge-ghost", a.Status.ToString())
+                        };
+                        <tr class="hover:bg-base-200/40 transition-colors border-b border-base-200/40 last:border-0">
+                            <td class="font-mono text-xs opacity-30">#@a.Id</td>
+                            <td class="font-semibold text-sm">@a.PatientName</td>
+                            <td class="text-sm opacity-60">@a.Date.ToString("MMM dd, yyyy")</td>
+                            <td class="text-xs opacity-50">@a.StartTime.ToString("hh:mm tt") – @a.EndTime.ToString("hh:mm tt")</td>
+                            <td><span class="badge @badge badge-sm font-semibold">@label</span></td>
+                            <td class="text-center">@(a.IsPaid ? "✅" : Html.Raw("<span class='opacity-20 text-base'>⏳</span>"))</td>
+                            <td class="text-right font-bold text-success text-sm">$@a.ConsultationFee.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="flex justify-center gap-2 pt-2">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <a asp-action="DoctorAppointments" asp-route-pageNumber="@i"
+                       class="btn btn-sm rounded-full @(i == currentPage ? "btn-primary" : "btn-ghost")">@i</a>
+                }
+            </div>
+        }
+    }
+</div>

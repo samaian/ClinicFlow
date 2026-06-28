@@ -1,0 +1,151 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "About ClinicFlow";
+}
+
+@section Styles {
+    <style>
+        /* 1. نلغي كل padding من main عشان الأقسام تبدأ من أول فراغ تحت الـ Navbar */
+        main.container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* 2. نلغي المسافة الزائدة اللي جاية من الـ Footer (mt-20) */
+        footer {
+            margin-top: 0 !important;
+        }
+
+        /* 3. منع التمرير الأفقي */
+        body {
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100% !important;
+        }
+
+        /* 4. تعديل بسيط عشان الـ Hero ياخد 100vh بالضبط تحت الـ Navbar */
+        .hero-full-height {
+            min-height: calc(100vh - 0px); /* هنضبطها بالـ pt */
+        }
+    </style>
+}
+
+<div class="w-full">
+
+    <!-- Hero Section: Full Height مع padding-top تحت الـ Navbar -->
+    <section class="pt-28 md:pt-32 pb-16 md:pb-20 lg:pb-24 bg-base-200/50 overflow-hidden relative w-full min-h-screen flex items-center">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center w-full">
+            <!-- النص -->
+            <div class="space-y-8 reveal">
+                <h1 class="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1]">
+                    Connecting Care, <br />
+                    <span class="text-primary">Redefining Access.</span>
+                </h1>
+                <p class="text-lg md:text-xl text-base-content/60 leading-relaxed max-w-xl">
+                    ClinicFlow was born from a simple mission: to bridge the gap between world-class specialists and patients through technology that puts people first.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a asp-controller="DoctorsUI" asp-action="Index" class="btn btn-primary btn-lg rounded-2xl px-10 md:px-12 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                        Meet the Doctors
+                    </a>
+                    <a asp-controller="Home" asp-action="Contact" class="btn btn-outline btn-lg rounded-2xl px-10 md:px-12">
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+            <!-- الصورة -->
+            <div class="relative reveal delay-200">
+                <div class="glass-card p-3 md:p-4 rounded-[2.5rem] md:rounded-[3rem] shadow-2xl rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=1000"
+                         class="rounded-[2rem] md:rounded-[2.5rem] w-full h-[250px] md:h-[400px] object-cover"
+                         alt="Clinic Office" />
+                </div>
+                <div class="absolute -bottom-4 -right-4 bg-primary text-primary-content px-6 py-3 rounded-full font-black text-sm shadow-xl">
+                    ⭐ 4.9/5 TrustScore
+                </div>
+            </div>
+        </div>
+        <!-- خلفية ديكورية -->
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+    </section>
+
+    <!-- Mission & Vision -->
+    <section class="py-20 md:py-32 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24">
+            <div class="space-y-6 reveal">
+                <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black">Our Mission</h2>
+                <p class="text-base md:text-lg opacity-70 leading-relaxed italic border-l-4 border-primary pl-6">
+                    "To democratize specialized medical care by providing a transparent, secure, and intuitive platform for patients and practitioners globally."
+                </p>
+            </div>
+            <div class="space-y-6 reveal delay-200">
+                <div class="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-black">Our Vision</h2>
+                <p class="text-base md:text-lg opacity-70 leading-relaxed italic border-l-4 border-secondary pl-6">
+                    "A world where distance and complexity are no longer barriers to receiving the highest quality medical expertise."
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team / Culture -->
+    <section class="py-20 md:py-32 bg-base-200/30 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="text-center mb-16 md:mb-20 reveal">
+                <span class="inline-block text-primary font-bold text-sm tracking-widest uppercase bg-primary/10 px-4 py-1 rounded-full mb-4">Why Trust Us</span>
+                <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-4">Integrity in Every Interaction</h2>
+                <p class="text-base md:text-lg opacity-60 max-w-2xl mx-auto">We follow rigorous standards to ensure the safety and privacy of every user.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                <div class="card bg-base-100 p-8 md:p-10 rounded-3xl md:rounded-[3rem] shadow-sm border border-base-200 hover:shadow-xl transition-shadow duration-300 reveal delay-100">
+                    <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Vetted Professionals</h3>
+                    <p class="opacity-60 text-sm leading-relaxed">Every doctor on our platform undergoes a multi-stage verification process covering credentials, experience, and patient safety.</p>
+                </div>
+                <div class="card bg-base-100 p-8 md:p-10 rounded-3xl md:rounded-[3rem] shadow-sm border border-base-200 hover:shadow-xl transition-shadow duration-300 reveal delay-200">
+                    <div class="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Secure Infrastructure</h3>
+                    <p class="opacity-60 text-sm leading-relaxed">Your medical and financial data is protected by bank-grade encryption and complies with international privacy regulations.</p>
+                </div>
+                <div class="card bg-base-100 p-8 md:p-10 rounded-3xl md:rounded-[3rem] shadow-sm border border-base-200 hover:shadow-xl transition-shadow duration-300 reveal delay-300">
+                    <div class="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mb-6">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Patient-Centricity</h3>
+                    <p class="opacity-60 text-sm leading-relaxed">We prioritize your experience, offering flexible cancellations, transparent ratings, and responsive customer support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-20 md:py-28 w-full bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+        <div class="max-w-4xl mx-auto px-4 md:px-8 text-center space-y-8 reveal">
+            <h2 class="text-4xl md:text-6xl font-black tracking-tight">Ready to <span class="text-primary">transform</span> your healthcare experience?</h2>
+            <p class="text-lg md:text-xl opacity-70 max-w-2xl mx-auto">Join thousands of patients who trust ClinicFlow to connect them with the right specialists.</p>
+            <div class="flex flex-wrap justify-center gap-4 pt-4">
+                <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg rounded-2xl px-12 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all">
+                    Get Started Free
+                </a>
+                <a asp-controller="DoctorsUI" asp-action="Index" class="btn btn-outline btn-lg rounded-2xl px-12">
+                    Browse Doctors
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>

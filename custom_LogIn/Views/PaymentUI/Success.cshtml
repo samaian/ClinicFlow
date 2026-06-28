@@ -1,0 +1,137 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Payment Successful";
+}
+
+@section Styles {
+    <style>
+        /* خلفية متدرجة خفيفة */
+        .success-page {
+            background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.08), transparent 40%), radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.05), transparent 40%), var(--fallback-b2, oklch(var(--b2)));
+        }
+        /* بطاقة الزجاج */
+        .success-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        [data-theme="night"] .success-card,
+        [data-theme="dracula"] .success-card {
+            background: rgba(17,24,39,0.55);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        /* أيقونة النجاح */
+        .success-icon {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.05));
+            box-shadow: 0 0 60px rgba(34, 197, 94, 0.15);
+        }
+        /* رقم الحجز */
+        .booking-ref {
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.1em;
+        }
+    </style>
+}
+
+<div class="success-page w-full min-h-screen flex items-center justify-center px-4 py-20 md:py-32">
+    <div class="w-full max-w-lg mx-auto">
+
+        <!-- البطاقة -->
+        <div class="success-card card shadow-2xl rounded-3xl p-10 md:p-14 border border-base-200 transition-all duration-300 hover:shadow-2xl">
+
+            <div class="card-body items-center text-center p-0">
+
+                <!-- أيقونة النجاح -->
+                <div class="success-icon w-24 h-24 rounded-full flex items-center justify-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-14 w-14 text-success"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2.5"
+                              d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+
+                <!-- العنوان -->
+                <h1 class="text-4xl md:text-5xl font-black tracking-tight text-success">
+                    Payment Successful!
+                </h1>
+
+                <!-- الرسالة -->
+                <p class="text-lg text-base-content/70 mt-3 max-w-sm">
+                    Your payment has been completed successfully.
+                </p>
+
+                <!-- فاصل -->
+                <div class="divider my-6"></div>
+
+                <!-- تفاصيل الحجز (افتراضية) -->
+              
+
+                <!-- فاصل -->
+                <div class="divider my-6"></div>
+
+                <!-- رسالة شكر -->
+                <p class="text-base-content/60 text-sm italic">
+                    "Thank you for choosing ClinicFlow. Your health is our priority."
+                </p>
+
+                <!-- الأزرار -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full mt-6">
+                    <a asp-controller="Home"
+                           asp-action="Index"
+                           class="btn btn-primary btn-lg rounded-2xl flex-1 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1" /></svg>
+                        Back to Home
+                    </a>
+                    <a asp-controller="Dashboard"
+                           asp-action="Index"
+                           class="btn btn-outline btn-lg rounded-2xl flex-1 hover:shadow-md transition-all">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+                        My Bookings
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- أيقونات أمان في الأسفل -->
+        <div class="flex justify-center gap-8 mt-8 opacity-40">
+            <span class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                256-bit Encryption
+            </span>
+            <span class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                Secure Payment
+            </span>
+            <span class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.1-.943a.5.5 0 01.706.05l.75.75a.5.5 0 01-.05.706l-.943 1.1L18 8.046V10a1 1 0 01-1 1h-1.323l-1.582 3.954.943 1.1a.5.5 0 01-.05.706l-.75.75a.5.5 0 01-.706-.05l-1.1-.943L10 18.954V17a1 1 0 01-1-1v-1.323l-3.954-1.582-1.1.943a.5.5 0 01-.706-.05l-.75-.75a.5.5 0 01.05-.706l.943-1.1L2 11.954V10a1 1 0 011-1h1.323l1.582-3.954-.943-1.1a.5.5 0 01.05-.706l.75-.75a.5.5 0 01.706.05l1.1.943L10 1.046V2a1 1 0 011 1z" /></svg>
+                Instant Confirmation
+            </span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // تأثير بسيط عند التحميل (اختياري)
+        document.addEventListener('DOMContentLoaded', function () {
+            const card = document.querySelector('.success-card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+    </script>
+}

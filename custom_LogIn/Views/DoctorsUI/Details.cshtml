@@ -1,0 +1,761 @@
+﻿@model DoctorDetailsDto
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = $"Dr. {Model.FullName} - {Model.SpecialtyName}";
+    var reviewsPaged = ViewData["ReviewsPaged"] as PagedResult<ReviewDto> ?? new PagedResult<ReviewDto>();
+    var reviews = reviewsPaged.Items.ToList();
+}
+
+@section Styles {
+    <style>
+        /* ---------- إلغاء التباعد من الـ main ---------- */
+        main.container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        footer {
+            margin-top: 0 !important;
+        }
+        body { overflow-x: hidden; }
+        .container { max-width: 100% !important; }
+
+        /* ---------- البطاقات والصور ---------- */
+        .profile-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .profile-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15); }
+        .doctor-avatar { object-fit: cover; transition: transform 0.5s ease; }
+        .doctor-avatar:hover { transform: scale(1.02); }
+
+        /* ---------- أزرار المواعيد ---------- */
+        .slot-btn {
+            transition: all 0.2s ease;
+            min-height: 44px;
+            font-weight: 600;
+        }
+        .slot-btn:hover:not(:disabled):not(.selected) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -6px var(--fallback-p, oklch(var(--p)/0.3));
+        }
+        .slot-btn.selected {
+            background: var(--fallback-p, oklch(var(--p)));
+            color: var(--fallback-pc, oklch(var(--pc)));
+            border-color: var(--fallback-p, oklch(var(--p)));
+            box-shadow: 0 4px 16px -4px var(--fallback-p, oklch(var(--p)/0.4));
+        }
+        .slot-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: transparent;
+            border-color: #e5e7eb;
+            color: #9ca3af;
+            text-decoration: line-through;
+        }
+
+        /* ---------- بطاقة الحجز الزجاجية ---------- */
+        .booking-card {
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        [data-theme="night"] .booking-card,
+        [data-theme="dracula"] .booking-card {
+            background: rgba(17,24,39,0.55);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        /* ---------- التقييمات ---------- */
+        .review-card { transition: all 0.3s ease; }
+        .review-card:hover { transform: translateX(4px); box-shadow: 0 4px 12px -4px rgba(0,0,0,0.05); }
+
+        .badge-verified {
+            background: var(--fallback-su, oklch(var(--su)));
+            color: var(--fallback-suc, oklch(var(--suc)));
+            font-weight: 800;
+            letter-spacing: 0.05em;
+        }
+
+        /* ---------- Pagination ---------- */
+        .pagination-join {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        [data-theme="night"] .pagination-join,
+        [data-theme="dracula"] .pagination-join {
+            background: rgba(17,24,39,0.5);
+        }
+        .pagination-join .btn-active {
+            background: var(--fallback-p, oklch(var(--p)));
+            color: var(--fallback-pc, oklch(var(--pc)));
+            border-color: var(--fallback-p, oklch(var(--p)));
+        }
+
+        /* ---------- نجوم التقييم ---------- */
+        .rating-star {
+            transition: transform 0.2s;
+        }
+        .rating-star:hover {
+            transform: scale(1.2);
+        }
+
+        /* ---------- Toast ---------- */
+        .toast-container {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 380px;
+            width: 100%;
+        }
+        .toast {
+            padding: 16px 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 60px -12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease, fadeOut 0.4s ease 2.8s forwards;
+            border: 1px solid rgba(255,255,255,0.15);
+            font-weight: 600;
+        }
+        .toast-success {
+            background: rgba(34, 197, 94, 0.9);
+            color: #fff;
+        }
+        .toast-error {
+            background: rgba(239, 68, 68, 0.9);
+            color: #fff;
+        }
+        .toast-icon {
+            font-size: 24px;
+            line-height: 1;
+        }
+        .toast-message {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        @@keyframes slideIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @@keyframes fadeOut {
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+
+        @@media (max-width: 640px) {
+            .toast-container {
+                top: 80px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        /* ---------- التقويم المتحرك (Slider) ---------- */
+        #sliderContainer {
+            display: flex;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .day-slide {
+            flex: 0 0 100%;
+            padding: 0 4px;
+        }
+    </style>
+}
+
+<div class="w-full">
+
+    <!-- ========== TOAST CONTAINER ========== -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- ==================== HERO / HEADER ==================== -->
+    <section class="pt-28 md:pt-32 pb-12 md:pb-16 bg-base-200/30 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 reveal">
+                <div>
+                    <div class="text-sm breadcrumbs opacity-50 mb-2">
+                        <ul>
+                            <li><a asp-controller="Home" asp-action="Index" class="hover:text-primary transition">Home</a></li>
+                            <li><a asp-controller="DoctorsUI" asp-action="Index" class="hover:text-primary transition">Doctors</a></li>
+                            <li>Dr. @Model.FullName</li>
+                        </ul>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+                        Dr. <span class="text-primary">@Model.FullName</span>
+                    </h1>
+                    <p class="text-lg opacity-60 mt-2 max-w-2xl">
+                        @Model.SpecialtyName · @Model.YearsOfExcperience+ years of experience
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="badge badge-verified badge-lg gap-2 px-6 py-4 text-sm font-bold shadow-md shadow-success/20">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                        Verified
+                    </span>
+                    <span class="badge badge-ghost badge-lg gap-2 px-6 py-4 text-sm font-bold">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                        @(Model.Rating.ToString("0.0")) (@reviewsPaged.TotalCount reviews)
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <section class="py-8 md:py-12 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-14 items-start">
+
+                <!-- LEFT COLUMN -->
+                <div class="lg:col-span-2 space-y-10 reveal">
+
+                    <!-- Profile Card -->
+                    <div class="card profile-card bg-base-100 shadow-xl rounded-3xl overflow-hidden border border-base-200">
+                        <div class="flex flex-col md:flex-row">
+                            <!-- Avatar -->
+                            <div class="md:w-80 h-72 md:h-auto bg-base-200/50 relative overflow-hidden">
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img src="@Model.ImageUrl" class="doctor-avatar w-full h-full object-cover" alt="Dr. @Model.FullName" />
+                                }
+                                else
+                                {
+                                    <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop&crop=face&auto=format"
+                                         class="doctor-avatar w-full h-full object-cover"
+                                         alt="Dr. @Model.FullName" />
+                                }
+                                <div class="absolute bottom-4 left-4">
+                                    <div class="badge badge-success badge-lg gap-2 px-5 py-3 font-black shadow-lg shadow-success/30">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                        VERIFIED
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Info -->
+                            <div class="card-body p-8 md:p-10 justify-center">
+                                <h2 class="text-3xl md:text-4xl font-black tracking-tight mb-2">Dr. @Model.FullName</h2>
+                                <div class="flex flex-wrap items-center gap-3 mb-6">
+                                    <span class="badge badge-primary badge-lg font-bold py-4 px-6">@Model.SpecialtyName</span>
+                                    <div class="flex items-center gap-1 font-bold text-yellow-500">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                        @Model.Rating.ToString("0.0") (@reviewsPaged.TotalCount reviews)
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-6 pt-6 border-t border-base-200">
+                                    <div>
+                                        <div class="text-xs font-black uppercase tracking-widest opacity-40 mb-1">Experience</div>
+                                        <div class="text-xl font-black">+@Model.YearsOfExcperience Years</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-black uppercase tracking-widest opacity-40 mb-1">Fee</div>
+                                        <div class="text-xl font-black text-primary">$@Model.ConsultationFee</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-black uppercase tracking-widest opacity-40 mb-1">Patients</div>
+                                        <div class="text-xl font-black">1.2k+</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Biography -->
+                    <div class="card profile-card bg-base-100 shadow-xl rounded-3xl p-8 md:p-10 border border-base-200 space-y-6">
+                        <h3 class="text-2xl font-black flex items-center gap-3">
+                            <svg class="w-6 h-6 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                            Professional Biography
+                        </h3>
+                        <p class="text-base md:text-lg opacity-70 leading-relaxed">
+                            @Model.Bio
+                        </p>
+                        <div class="space-y-4 pt-2">
+                            <h4 class="font-black text-lg">Specializations</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="badge badge-outline badge-lg rounded-xl px-6 py-3 text-sm font-medium">Clinical Care</span>
+                                <span class="badge badge-outline badge-lg rounded-xl px-6 py-3 text-sm font-medium">Consultation</span>
+                                <span class="badge badge-outline badge-lg rounded-xl px-6 py-3 text-sm font-medium">Diagnostics</span>
+                                <span class="badge badge-outline badge-lg rounded-xl px-6 py-3 text-sm font-medium">Patient Education</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========== REVIEWS SECTION ========== -->
+                    <!-- نموذج إضافة التقييم بالنجوم -->
+                    <form asp-action="AddReview" method="post" class="card bg-base-100 p-8 rounded-3xl border border-base-200 shadow-sm space-y-6">
+                        @Html.AntiForgeryToken() <!-- مهم للتوكن -->
+                        <input type="hidden" name="DoctorId" value="@Model.ProfileId" />
+                        <h3 class="text-2xl font-black flex items-center gap-3">
+                            <svg class="w-6 h-6 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                            Write a Review
+                        </h3>
+
+                        <!-- اختيار التقييم بالنجوم -->
+                        <div class="form-control">
+                            <label class="label font-bold text-sm">Your Rating</label>
+                            <div class="rating rating-lg gap-2">
+                                <input type="radio" name="Rating" value="1" class="mask mask-star-2 bg-orange-400 rating-star" id="star1" />
+                                <input type="radio" name="Rating" value="2" class="mask mask-star-2 bg-orange-400 rating-star" id="star2" />
+                                <input type="radio" name="Rating" value="3" class="mask mask-star-2 bg-orange-400 rating-star" id="star3" />
+                                <input type="radio" name="Rating" value="4" class="mask mask-star-2 bg-orange-400 rating-star" id="star4" />
+                                <input type="radio" name="Rating" value="5" class="mask mask-star-2 bg-orange-400 rating-star" id="star5" checked />
+                            </div>
+                            <span class="text-sm opacity-50 mt-2">Click on a star to rate</span>
+                        </div>
+
+                        <!-- التعليق -->
+                        <div class="form-control">
+                            <label class="label font-bold text-sm">Your Comment</label>
+                            <textarea name="Comment" rows="3" class="textarea textarea-bordered rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition" placeholder="Share your experience with Dr. @Model.FullName..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary rounded-2xl px-10 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                            Submit Review
+                        </button>
+                    </form>
+
+                    <!-- Reviews List -->
+                    <div class="space-y-8">
+                        <h3 class="text-2xl font-black px-4 flex items-center gap-3">
+                            <svg class="w-6 h-6 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            Patient Feedback
+                            <span class="badge badge-ghost ml-2">@reviewsPaged.TotalCount total</span>
+                        </h3>
+
+                        <div class="grid grid-cols-1 gap-4">
+                            @if (!reviews.Any())
+                            {
+                                <div class="alert alert-info rounded-2xl shadow-sm border border-info/20">
+                                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <span>No reviews yet. Be the first to share your experience!</span>
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var review in reviews)
+                                {
+                                    <div class="card review-card bg-base-100 shadow-sm rounded-2xl p-6 md:p-8 border border-base-200 hover:shadow-md transition-all">
+                                        <div class="flex flex-wrap justify-between items-start gap-4 mb-4">
+                                            <div class="flex items-center gap-4">
+                                                <div class="avatar placeholder">
+                                                    <div class="bg-primary/10 text-primary rounded-full w-12 h-12 flex items-center justify-center font-black text-lg">
+                                                        @review.PatientName[0]
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold text-base">@review.PatientName</div>
+                                                    <div class="text-xs opacity-50 font-medium">Verified Patient</div>
+                                                </div>
+                                            </div>
+                                            <!-- ====== عرض النجوم + الرقم ====== -->
+                                            <div class="flex items-center gap-2">
+                                                <div class="rating rating-sm">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        <input type="radio" 
+                                                               name="review-star-@review.Id" 
+                                                               value="@i" 
+                                                               class="mask mask-star-2 bg-orange-400" 
+                                                               @(i == review.Rating ? "checked" : "") 
+                                                               disabled />
+                                                    }
+                                                </div>
+                                                <span class="text-sm font-bold opacity-60 ml-1">@review.Rating / 5</span>
+                                            </div>
+                                        </div>
+                                        <p class="opacity-70 italic text-sm leading-relaxed">"@review.Comment"</p>
+                                        <div class="text-right text-[10px] font-black opacity-30 mt-4 uppercase tracking-widest">
+                                            @review.CreatedAt.ToString("MMMM dd, yyyy")
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <!-- ====== PAGINATION CONTROLS ====== -->
+                        @if (reviewsPaged.TotalPages > 1)
+                        {
+                            <div class="flex justify-center pt-6">
+                                <div class="join pagination-join shadow-sm border border-base-200/50 p-1 rounded-2xl backdrop-blur-sm">
+                                    @if (reviewsPaged.HasPreviousPage)
+                                    {
+                                        <a asp-action="Details"
+                                           asp-route-id="@Model.ProfileId"
+                                           asp-route-pageNumber="@(reviewsPaged.PageNumber - 1)"
+                                           asp-route-pageSize="@reviewsPaged.PageSize"
+                                           class="join-item btn btn-ghost btn-sm md:btn-md">
+                                            «
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="join-item btn btn-ghost btn-sm md:btn-md opacity-30 cursor-not-allowed">«</span>
+                                    }
+
+                                    @for (int i = 1; i <= reviewsPaged.TotalPages; i++)
+                                    {
+                                        <a asp-action="Details"
+                                           asp-route-id="@Model.ProfileId"
+                                           asp-route-pageNumber="@i"
+                                           asp-route-pageSize="@reviewsPaged.PageSize"
+                                           class="join-item btn btn-ghost btn-sm md:btn-md @(i == reviewsPaged.PageNumber ? "btn-active !bg-primary !text-primary-content shadow-md shadow-primary/30" : "")">
+                                            @i
+                                        </a>
+                                    }
+
+                                    @if (reviewsPaged.HasNextPage)
+                                    {
+                                        <a asp-action="Details"
+                                           asp-route-id="@Model.ProfileId"
+                                           asp-route-pageNumber="@(reviewsPaged.PageNumber + 1)"
+                                           asp-route-pageSize="@reviewsPaged.PageSize"
+                                           class="join-item btn btn-ghost btn-sm md:btn-md">
+                                            »
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="join-item btn btn-ghost btn-sm md:btn-md opacity-30 cursor-not-allowed">»</span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- ==================== RIGHT COLUMN: Booking ==================== -->
+                <div class="space-y-8 lg:sticky lg:top-28">
+                    <div class="card booking-card shadow-2xl rounded-3xl p-8 md:p-10 border border-base-200 overflow-hidden relative">
+                        <div class="absolute top-0 right-0 p-6 opacity-5">
+                            <svg class="w-28 h-28" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/></svg>
+                        </div>
+                        <div class="relative z-10 space-y-8">
+                            <div>
+                                <h3 class="text-2xl font-black mb-1">Book Appointment</h3>
+                                <p class="text-sm opacity-60">Select an available slot to continue.</p>
+                            </div>
+
+                            <!-- ========== التقويم المتحرك مع اختيار الموعد ========== -->
+                            <div class="space-y-6">
+                                @{
+                                    var allSlots = Model.Availabilities
+                                        .GroupBy(a => a.Date.Date)
+                                        .OrderBy(g => g.Key)
+                                        .ToList();
+
+                                    var today = DateTime.Today;
+                                    var currentDayIndex = 0;
+
+                                    if (allSlots.Any())
+                                    {
+                                        var futureDay = allSlots.FirstOrDefault(g => g.Key.Date >= today.Date);
+                                        if (futureDay != null)
+                                        {
+                                            currentDayIndex = allSlots.IndexOf(futureDay);
+                                        }
+                                        else
+                                        {
+                                            currentDayIndex = allSlots.Count - 1;
+                                        }
+                                    }
+
+                                    var totalDays = allSlots.Count;
+                                }
+
+                                @if (!allSlots.Any())
+                                {
+                                    <div class="alert alert-warning rounded-2xl border border-warning/20 shadow-sm">
+                                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                        <span>No available slots at the moment. Please check back later.</span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="space-y-4" id="calendarWrapper">
+                                        <!-- رأس التقويم -->
+                                        <div class="flex items-center justify-between">
+                                            <button id="prevDayBtn" class="btn btn-ghost btn-sm rounded-full px-4 @(currentDayIndex == 0 ? "opacity-30 cursor-not-allowed" : "")" @(currentDayIndex == 0 ? "disabled" : "")>
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                                            </button>
+                                            <div class="text-center">
+                                                <div id="currentDateDisplay" class="text-sm font-black uppercase tracking-[0.15em] opacity-60">
+                                                    @allSlots[currentDayIndex].Key.ToString("MMMM dd, yyyy")
+                                                </div>
+                                                <div id="slotsCountDisplay" class="text-xs opacity-40 font-medium">
+                                                    @(allSlots[currentDayIndex].Count(s => s.IsAvailable)) slots available
+                                                </div>
+                                            </div>
+                                            <button id="nextDayBtn" class="btn btn-ghost btn-sm rounded-full px-4 @(currentDayIndex == totalDays - 1 ? "opacity-30 cursor-not-allowed" : "")" @(currentDayIndex == totalDays - 1 ? "disabled" : "")>
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- حاوية الأيام (Slides) -->
+                                        <div class="overflow-hidden relative">
+                                            <div id="sliderContainer" class="flex transition-transform duration-300 ease-in-out" style="transform: translateX(-@(currentDayIndex * 100)%);">
+                                                @foreach (var dayGroup in allSlots)
+                                                {
+                                                    <div class="min-w-full px-1 day-slide" data-date="@dayGroup.Key.ToString("yyyy-MM-dd")">
+                                                        <div class="grid grid-cols-2 gap-2">
+                                                            @foreach (var slot in dayGroup)
+                                                            {
+                                                                var isAvailable = slot.IsAvailable;
+                                                                <button class="slot-btn btn @(isAvailable ? "btn-outline hover:btn-primary" : "btn-ghost opacity-40 cursor-not-allowed") btn-sm rounded-xl font-bold transition-all @(isAvailable ? "hover:shadow-md" : "")"
+                                                                        @(!isAvailable ? "disabled" : "")
+                                                                        data-slot-id="@slot.Id">
+                                                                    @slot.StartTime.ToString("hh:mm tt")
+                                                                </button>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- السعر وزر الدفع -->
+                            <div class="pt-6 border-t border-base-200">
+                                <div class="flex justify-between items-center mb-6">
+                                    <span class="font-bold opacity-60">Consultation Fee</span>
+                                    <span class="text-3xl font-black text-primary">$@Model.ConsultationFee</span>
+                                </div>
+
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <button id="proceedToPaymentBtn" class="btn btn-primary btn-lg w-full rounded-2xl h-14 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all" disabled>
+                                        Select a slot first
+                                    </button>
+                                }
+                                else
+                                {
+                                    <div class="space-y-3">
+                                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" 
+                                           class="btn btn-primary btn-lg w-full rounded-2xl h-14 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all">
+                                            Login to Book
+                                        </a>
+                                        <p class="text-center text-xs opacity-50 font-bold uppercase tracking-widest">Or create a new account</p>
+                                        <a asp-controller="Account" asp-action="Register" 
+                                           class="btn btn-ghost btn-sm w-full font-black hover:bg-primary/10 transition">
+                                            Join ClinicFlow Now
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Why Book Online? -->
+                    <div class="card bg-primary text-primary-content p-8 rounded-3xl shadow-xl relative overflow-hidden">
+                        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full -mb-16 -mr-16 blur-2xl"></div>
+                        <div class="absolute top-0 left-0 w-20 h-20 bg-white/5 rounded-full -mt-10 -ml-10 blur-xl"></div>
+                        <div class="relative z-10 space-y-5">
+                            <h4 class="text-xl font-black flex items-center gap-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                Why Book Online?
+                            </h4>
+                            <ul class="text-sm space-y-3 font-medium opacity-95">
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    Instant confirmation
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    Secure Stripe payments
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    Easy cancellations
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                    24/7 support
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA ==================== -->
+    <section class="py-16 md:py-24 w-full bg-gradient-to-r from-primary/5 to-secondary/5 mt-4">
+        <div class="max-w-4xl mx-auto px-4 md:px-8 text-center reveal">
+            <h3 class="text-2xl md:text-3xl font-black">Not the right fit?</h3>
+            <p class="text-base opacity-60 max-w-xl mx-auto mt-2">
+                Explore our full list of verified specialists to find the perfect match for your healthcare needs.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 mt-6">
+                <a asp-controller="DoctorsUI" asp-action="Index" class="btn btn-primary btn-lg rounded-2xl px-12 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all">
+                    Browse All Doctors
+                </a>
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-outline btn-lg rounded-2xl px-12">
+                    Contact Support
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ========== SCRIPTS SECTION (المعدل) ========== -->
+@section Scripts {
+    <!-- عرض الرسائل (Toast) -->
+    @{
+        var successMsg = TempData["Success"] as string;
+        var errorMsg = TempData["Error"] as string;
+    }
+    <script>
+        // دالة عرض Toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${type === 'success' ? '✅' : '❌'}</span>
+                <span class="toast-message">${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 4000);
+        }
+
+        // عرض الرسائل إذا وجدت
+        document.addEventListener('DOMContentLoaded', function () {
+            @if (!string.IsNullOrEmpty(successMsg))
+            {
+                <text>showToast('@Html.Raw(successMsg)', 'success');</text>
+            }
+            @if (!string.IsNullOrEmpty(errorMsg))
+            {
+                <text>showToast('@Html.Raw(errorMsg)', 'error');</text>
+            }
+        });
+
+        // ========== التحكم في التقويم المتحرك ==========
+        document.addEventListener('DOMContentLoaded', function () {
+            const sliderContainer = document.getElementById('sliderContainer');
+            const prevBtn = document.getElementById('prevDayBtn');
+            const nextBtn = document.getElementById('nextDayBtn');
+            const currentDateDisplay = document.getElementById('currentDateDisplay');
+            const slotsCountDisplay = document.getElementById('slotsCountDisplay');
+            const daySlides = document.querySelectorAll('.day-slide');
+            const totalDays = daySlides.length;
+            let currentIndex = @currentDayIndex;
+
+            function updateSlider(index) {
+                if (index < 0) index = 0;
+                if (index >= totalDays) index = totalDays - 1;
+                currentIndex = index;
+                sliderContainer.style.transform = `translateX(-${index * 100}%)`;
+
+                const activeSlide = daySlides[index];
+                const dateAttr = activeSlide.dataset.date;
+                const dateObj = new Date(dateAttr + 'T00:00:00');
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                currentDateDisplay.textContent = dateObj.toLocaleDateString('en-US', options);
+
+                const availableSlots = activeSlide.querySelectorAll('.slot-btn:not([disabled])').length;
+                slotsCountDisplay.textContent = `${availableSlots} slots available`;
+
+                prevBtn.disabled = (index === 0);
+                prevBtn.classList.toggle('opacity-30', index === 0);
+                prevBtn.classList.toggle('cursor-not-allowed', index === 0);
+                nextBtn.disabled = (index === totalDays - 1);
+                nextBtn.classList.toggle('opacity-30', index === totalDays - 1);
+                nextBtn.classList.toggle('cursor-not-allowed', index === totalDays - 1);
+            }
+
+            prevBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (currentIndex > 0) updateSlider(currentIndex - 1);
+            });
+
+            nextBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (currentIndex < totalDays - 1) updateSlider(currentIndex + 1);
+            });
+
+            updateSlider(currentIndex);
+        });
+
+        // ========== اختيار الموعد وإرسال الدفع (بالمسار الصحيح) ==========
+        document.addEventListener('DOMContentLoaded', function () {
+            let selectedSlotId = null;
+            const paymentBtn = document.getElementById('proceedToPaymentBtn');
+
+            // عند الضغط على أي زر موعد
+            document.querySelectorAll('.slot-btn:not([disabled])').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    // إزالة التحديد من جميع الأزرار
+                    document.querySelectorAll('.slot-btn:not([disabled])').forEach(b => {
+                        b.classList.remove('selected');
+                        b.classList.remove('btn-primary');
+                    });
+                    // تحديد الزر الحالي
+                    this.classList.add('selected');
+                    this.classList.add('btn-primary');
+                    selectedSlotId = this.dataset.slotId;
+                    // تفعيل زر الدفع
+                    paymentBtn.disabled = false;
+                    paymentBtn.textContent = `Proceed to Payment ($$@Model.ConsultationFee)`;
+                    paymentBtn.classList.remove('btn-ghost');
+                    paymentBtn.classList.add('btn-primary');
+                });
+            });
+
+            // عند الضغط على زر الدفع
+            paymentBtn.addEventListener('click', async function () {
+                if (!selectedSlotId) {
+                    showToast('Please select a time slot first.', 'error');
+                    return;
+                }
+
+                // تعطيل الزر لمنع الضغط المتكرر
+                this.disabled = true;
+                this.textContent = 'Processing...';
+
+                try {
+                    // إرسال الطلب مع اعتماد Cookie Authentication
+                    const response = await fetch(`/api/payments/checkout/${selectedSlotId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include' // مهم جداً لإرسال Cookie المصادقة
+                    });
+
+                    // محاولة تحليل الاستجابة كـ JSON
+                    const result = await response.json();
+
+                    if (response.ok && result.url) {
+                        // التوجيه إلى Stripe Checkout
+                        window.location.href = result.url;
+                    } else {
+                        // عرض رسالة الخطأ من السيرفر
+                        const errorMsg = result.error || result.message || 'Payment initiation failed. Please try again.';
+                        showToast(errorMsg, 'error');
+                        this.disabled = false;
+                        this.textContent = `Proceed to Payment ($$@Model.ConsultationFee)`;
+                    }
+                } catch (error) {
+                    console.error('Payment error:', error);
+                    showToast('Network error. Please try again.', 'error');
+                    this.disabled = false;
+                    this.textContent = `Proceed to Payment ($$@Model.ConsultationFee)`;
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,79 @@
+@model DoctorDto
+
+<div class="card doctor-card bg-base-100 shadow-xl rounded-3xl overflow-hidden border border-base-200 transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] group">
+    
+    <!-- صورة الطبيب -->
+    <figure class="relative overflow-hidden h-56 md:h-64 bg-base-200/50">
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <img src="@Model.ImageUrl"
+                 alt="Dr. @Model.FullName"
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        }
+        else
+        {
+            <!-- صورة دكتور من الإنترنت بدلاً من الـ Avatar -->
+            <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=500&h=500&fit=crop&crop=face"
+                 alt="Dr. @Model.FullName"
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        }
+
+        <!-- Badge التقييم (يظهر فوق الصورة) -->
+        <div class="absolute bottom-4 left-4 flex items-center gap-2 bg-base-100/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+            <div class="rating rating-xs">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <input type="radio"
+                           name="rating-@Model.ProfileId"
+                           class="mask mask-star-2 bg-orange-400"
+                    @(i == (int)Model.AverageRating ? "checked" : "")
+                           disabled />
+                }
+            </div>
+            <span class="text-sm font-bold opacity-70">@Model.AverageRating.ToString("0.0")</span>
+        </div>
+
+        <!-- Badge عدد التقييمات -->
+        <div class="absolute top-4 right-4">
+            <span class="badge badge-ghost gap-2 px-4 py-3 font-black shadow-lg">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                @Model.ReviewCount reviews
+            </span>
+        </div>
+    </figure>
+
+    <!-- محتوى البطاقة -->
+    <div class="card-body p-6 md:p-8">
+        <!-- الاسم والتخصص -->
+        <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+            <h3 class="text-xl md:text-2xl font-black tracking-tight">
+                Dr. @Model.FullName
+            </h3>
+            <span class="badge badge-primary badge-sm font-bold px-4 py-2">@Model.SpecialtyName</span>
+        </div>
+
+        <!-- معلومات إضافية -->
+        <div class="grid grid-cols-2 gap-4 mt-2 text-sm">
+            <div>
+                <div class="text-xs font-black uppercase tracking-widest opacity-40">Experience</div>
+                <div class="font-bold">+@Model.YearsOfExcperience yr</div>
+            </div>
+            <div>
+                <div class="text-xs font-black uppercase tracking-widest opacity-40">Fee</div>
+                <div class="font-bold text-primary">$@Model.ConsultationFee</div>
+            </div>
+        </div>
+
+        <!-- خط فاصل -->
+        <div class="divider my-4"></div>
+
+        <!-- زر التفاصيل -->
+        <div class="flex items-center justify-end">
+            <a asp-controller="DoctorsUI" asp-action="Details" asp-route-id="@Model.ProfileId"
+                   class="btn btn-primary btn-sm rounded-full px-6 shadow-md shadow-primary/20 hover:shadow-primary/40 transition-all group-hover:shadow-lg">
+                View Profile
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+            </a>
+        </div>
+    </div>
+</div>

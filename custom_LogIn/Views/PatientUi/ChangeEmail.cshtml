@@ -1,0 +1,106 @@
+﻿@model Clinic_System.ChangeEmailViewModel
+@{
+    Layout = "_PatientLayout";
+    ViewData["Title"] = "Change Email";
+}
+
+@section Styles {
+    <style>
+        .form-card {
+            background: rgba(255,255,255,.45);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 1.5rem;
+            padding: 1.75rem;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        [data-theme="night"] .form-card,
+        [data-theme="dracula"] .form-card {
+            background: rgba(17,24,39,.45);
+            border-color: rgba(255,255,255,.08);
+        }
+
+        .ig {
+            background: rgba(255,255,255,.3) !important;
+            border-color: rgba(255,255,255,.15) !important;
+            transition: all .2s;
+        }
+
+        [data-theme="night"] .ig, [data-theme="dracula"] .ig {
+            background: rgba(17,24,39,.3) !important;
+            border-color: rgba(255,255,255,.08) !important;
+        }
+
+        .ig:focus {
+            border-color: oklch(var(--p)) !important;
+            box-shadow: 0 0 0 2px oklch(var(--p)/.2) !important;
+        }
+    </style>
+}
+
+<div class="space-y-6">
+
+    <div>
+        <a asp-action="Profile" class="text-sm opacity-50 hover:opacity-100 transition flex items-center gap-1 mb-3">
+            ← Back to Profile
+        </a>
+        <h1 class="text-2xl font-bold tracking-tight">✉️ Change Email</h1>
+        <p class="text-sm opacity-50 mt-1">A confirmation link will be sent to your new address.</p>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-xl text-sm border-0 shadow-sm">✅ @TempData["Success"]</div>
+    }
+
+    <div class="form-card shadow-sm space-y-5">
+
+        @if (ViewBag.CurrentEmail != null)
+        {
+            <div class="flex items-center gap-3 p-3 bg-base-200/40 rounded-xl">
+                <span class="text-sm opacity-50 font-medium">Current:</span>
+                <span class="font-mono text-sm text-primary">@ViewBag.CurrentEmail</span>
+            </div>
+        }
+
+        <form asp-action="ChangeEmail" method="post" class="space-y-5">
+            @Html.AntiForgeryToken()
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-error rounded-xl text-sm border-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <div>⚠️ @error.ErrorMessage</div>
+                    }
+                </div>
+            }
+
+            <div class="alert alert-info rounded-xl text-sm border-0">
+                ℹ️ After changing your email you will be logged out to confirm the new address.
+            </div>
+
+            <div class="form-control">
+                <label class="label font-semibold text-sm pb-1">New Email Address</label>
+                <input asp-for="NewEmail" type="email"
+                       class="input input-bordered rounded-xl ig w-full"
+                       placeholder="new@example.com" />
+                <span asp-validation-for="NewEmail" class="text-error text-xs mt-1"></span>
+            </div>
+
+            <div class="flex gap-3 pt-1">
+                <button type="submit"
+                        class="btn btn-primary btn-sm rounded-full px-6 shadow shadow-primary/20">
+                    ✉️ Update Email
+                </button>
+                <a asp-action="Profile" class="btn btn-ghost btn-sm rounded-full px-6">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

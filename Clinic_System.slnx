@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Clinic_System.BLL/Clinic_System.BLL.csproj" Id="cfdc228e-573c-42d3-b87c-28424aa75c78" />
+  <Project Path="Clinic_system.DAL/Clinic_system.DAL.csproj" Id="470614e6-b29e-4280-a06c-80fa5fe5200d" DisplayName="Clinic_System.DAL" />
+  <Project Path="custom_LogIn/Clinic_System.PL.csproj" />
+</Solution>

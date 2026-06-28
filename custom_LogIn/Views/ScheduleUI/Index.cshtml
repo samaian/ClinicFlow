@@ -1,0 +1,126 @@
+﻿@model List<Clinic_System.ScheduleDto>
+@using Clinic_System
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "My Schedule";
+    var upcoming = Model?.Where(s => s.Day.Date >= DateTime.Today).ToList() ?? new();
+    var past = Model?.Where(s => s.Day.Date < DateTime.Today).ToList() ?? new();
+}
+
+<div class="space-y-5">
+
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-xl font-black tracking-tight">🕒 My Schedule</h1>
+            <p class="text-xs opacity-40 mt-0.5">@(upcoming.Count) upcoming slot@(upcoming.Count != 1 ? "s" : "")</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary btn-sm rounded-full px-5 shadow shadow-primary/20 text-xs">
+            + Add Slot
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success rounded-xl text-sm border-0 shadow-sm">✅ @TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-error rounded-xl text-sm border-0">⚠️ @TempData["Error"]</div>
+    }
+
+    @if (!upcoming.Any() && !past.Any())
+    {
+        <div class="flex flex-col items-center justify-center py-24 opacity-30 space-y-3">
+            <div class="text-6xl">🗓️</div>
+            <p class="text-base font-semibold">No schedule slots yet.</p>
+            <a asp-action="Create" class="btn btn-primary btn-sm rounded-full px-6 opacity-100">Add your first slot</a>
+        </div>
+    }
+    else
+    {
+        @* Upcoming slots *@
+        @if (upcoming.Any())
+        {
+            <div class="rounded-2xl border border-base-200/60 bg-base-100/60 backdrop-blur shadow-sm overflow-hidden">
+                <div class="px-5 py-3 border-b border-base-200/60 text-xs font-bold uppercase tracking-wider opacity-40">
+                    Upcoming
+                </div>
+                <table class="table table-sm w-full">
+                    <thead>
+                        <tr class="text-xs uppercase opacity-40 border-b border-base-200">
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                            <th class="text-center">Booked</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in upcoming)
+                        {
+                            <tr class="hover:bg-base-200/40 transition-colors border-b border-base-200/40 last:border-0">
+                                <td class="font-semibold text-sm">@s.Day.ToString("ddd, MMM dd yyyy")</td>
+                                <td class="text-sm opacity-60">@s.StartTime.ToString("hh:mm tt") – @s.EndTime.ToString("hh:mm tt")</td>
+                                <td>
+                                    @if (s.Status == ScheduleStatus.Avaliable)
+                                    {
+                                        <span class="badge badge-success badge-sm font-semibold">Available</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-error badge-sm font-semibold">Unavailable</span>
+                                    }
+                                </td>
+                                <td class="text-center">@(s.HasAppointment ? "✅" : Html.Raw("<span class='opacity-20'>—</span>"))</td>
+                                <td class="text-right">
+                                    @if (!s.HasAppointment)
+                                    {
+                                        <form asp-action="Delete" method="post" class="inline"
+                                              onsubmit="return confirm('Delete this slot?')">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@s.Id" />
+                                            <button type="submit" class="btn btn-ghost btn-xs text-error rounded-lg">🗑 Delete</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-xs opacity-30 italic">Booked</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @* Past slots *@
+        @if (past.Any())
+        {
+            <details class="rounded-2xl border border-base-200/40 bg-base-100/40 overflow-hidden">
+                <summary class="px-5 py-3 text-xs font-bold uppercase tracking-wider opacity-40 cursor-pointer select-none">
+                    Past slots (@past.Count)
+                </summary>
+                <table class="table table-sm w-full opacity-50">
+                    <thead>
+                        <tr class="text-xs uppercase opacity-40 border-b border-base-200">
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in past.OrderByDescending(s => s.Day))
+                        {
+                            <tr class="border-b border-base-200/40 last:border-0">
+                                <td class="text-sm">@s.Day.ToString("ddd, MMM dd yyyy")</td>
+                                <td class="text-sm">@s.StartTime.ToString("hh:mm tt") – @s.EndTime.ToString("hh:mm tt")</td>
+                                <td><span class="badge badge-ghost badge-sm">@(s.HasAppointment ? "Was booked" : "Empty")</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </details>
+        }
+    }
+</div>

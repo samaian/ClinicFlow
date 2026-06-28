@@ -1,0 +1,224 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Terms of Service";
+}
+
+@section Styles {
+    <style>
+        /* 1. إلغاء كل padding من main عشان الأقسام تبدأ من أول فراغ تحت الـ Navbar */
+        main.container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* 2. إلغاء المسافة الزائدة فوق الفوتر */
+        footer {
+            margin-top: 0 !important;
+        }
+
+        /* 3. منع التمرير الأفقي */
+        body {
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100% !important;
+        }
+
+        /* 4. تنسيقات إضافية لمحتوى الشروط والأحكام */
+        .terms-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .terms-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 60px -20px rgba(0,0,0,0.15);
+        }
+
+        /* تحسين مظهر الـ prose */
+        .prose h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .prose h3::before {
+            content: "▹";
+            color: var(--fallback-p, oklch(var(--p)));
+            font-size: 1.2em;
+        }
+        .prose p {
+            opacity: 0.75;
+            line-height: 1.8;
+        }
+        .prose p:first-of-type {
+            font-size: 1.1rem;
+            opacity: 0.85;
+        }
+        .prose ul, .prose ol {
+            opacity: 0.75;
+        }
+        .prose strong {
+            color: var(--fallback-p, oklch(var(--p)));
+            font-weight: 700;
+        }
+
+        /* تنسيق البطاقة في الموبايل */
+        @@media (max-width: 640px) {
+            .terms-card {
+                padding: 1.5rem !important;
+                border-radius: 2rem !important;
+            }
+            .terms-card h1 {
+                font-size: 2.5rem !important;
+            }
+        }
+    </style>
+}
+
+<div class="w-full">
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="pt-28 md:pt-32 pb-8 md:pb-12 bg-base-200/30 w-full">
+        <div class="max-w-4xl mx-auto px-4 md:px-8 text-center reveal">
+            <span class="inline-block text-primary font-bold text-sm tracking-widest uppercase bg-primary/10 px-4 py-1 rounded-full mb-4">Legal</span>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-4">
+                Terms of <span class="text-primary">Service</span>
+            </h1>
+            <p class="text-lg md:text-xl opacity-60 max-w-2xl mx-auto">
+                Please read these terms carefully before using ClinicFlow.
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <section class="py-12 md:py-20 w-full">
+        <div class="max-w-4xl mx-auto px-4 md:px-8">
+            <div class="card bg-base-100 p-8 md:p-16 lg:p-20 rounded-3xl md:rounded-[4rem] shadow-xl border border-base-200/60 terms-card space-y-10 md:space-y-12 reveal">
+                
+                <!-- العنوان والتاريخ -->
+                <div class="space-y-2">
+                    <h1 class="text-4xl md:text-5xl font-black tracking-tight">Terms of Service</h1>
+                    <p class="text-xs font-black uppercase tracking-widest opacity-40 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Last Updated: May 2026
+                    </p>
+                </div>
+
+                <!-- المحتوى -->
+                <article class="prose prose-lg md:prose-xl max-w-none prose-headings:font-black prose-headings:tracking-tight prose-headings:text-base-content prose-p:text-base-content/70 prose-li:text-base-content/70 prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+                    
+                    <p>
+                        By using ClinicFlow, you agree to comply with and be bound by the following terms and conditions of use. 
+                        If you do not agree with any part of these terms, please do not use our platform.
+                    </p>
+                    
+                    <h3>1. User Accounts</h3>
+                    <p>
+                        Users must provide accurate, complete, and up-to-date information when creating an account. 
+                        You are solely responsible for maintaining the confidentiality of your login credentials and 
+                        for all activities that occur under your account. Notify us immediately of any unauthorized use.
+                    </p>
+
+                    <h3>2. Booking and Payments</h3>
+                    <p>
+                        Bookings are confirmed only after successful payment processing via our secure PCI-compliant 
+                        payment gateway. Service fees are set by individual practitioners and include platform service 
+                        charges. All payments are non-refundable except as outlined in our cancellation policy.
+                    </p>
+
+                    <h3>3. Cancellation Policy</h3>
+                    <p>
+                        Cancellations must be requested through the patient dashboard at least <strong>24 hours</strong> 
+                        prior to the scheduled appointment for a full refund. Cancellations made within 24 hours may 
+                        be subject to a partial fee. Missed appointments (<strong>no-shows</strong>) are non-refundable 
+                        and may incur a penalty.
+                    </p>
+
+                    <h3>4. Platform Role &amp; Disclaimer</h3>
+                    <p>
+                        ClinicFlow is a <strong>marketplace</strong> connecting patients with independent healthcare 
+                        providers. We do not provide medical advice, diagnosis, or treatment. All medical consultations 
+                        are strictly between the patient and the practitioner. Always consult a qualified healthcare 
+                        professional for medical decisions.
+                    </p>
+
+                    <h3>5. Prohibited Conduct</h3>
+                    <p>
+                        Users are strictly prohibited from:
+                    </p>
+                    <ul>
+                        <li>Using the platform for any fraudulent, unlawful, or abusive purposes.</li>
+                        <li>Harassing, threatening, or abusing medical staff or other users.</li>
+                        <li>Posting false or misleading information about practitioners or services.</li>
+                        <li>Attempting to bypass or interfere with our security systems.</li>
+                    </ul>
+                    <p>
+                        Violation of these rules may result in immediate account suspension or termination without notice.
+                    </p>
+
+                    <h3>6. Data Privacy</h3>
+                    <p>
+                        We are committed to protecting your privacy. All personal and medical data is processed in 
+                        accordance with our <a asp-action="Privacy">Privacy Policy</a> and applicable data protection 
+                        regulations (GDPR, HIPAA). We use industry-standard encryption to safeguard your information.
+                    </p>
+
+                    <h3>7. Limitation of Liability</h3>
+                    <p>
+                        To the fullest extent permitted by law, ClinicFlow and its affiliates shall not be liable for 
+                        any indirect, incidental, or consequential damages arising from the use of our platform. Our 
+                        total liability shall not exceed the amount paid by you for the specific service in question.
+                    </p>
+
+                    <h3>8. Changes to Terms</h3>
+                    <p>
+                        We reserve the right to modify these terms at any time. Changes will be posted on this page with 
+                        an updated date. Continued use of the platform after any changes constitutes your acceptance of 
+                        the new terms.
+                    </p>
+
+                    <h3>9. Governing Law</h3>
+                    <p>
+                        These terms are governed by and construed in accordance with the laws of England and Wales. 
+                        Any disputes arising from these terms shall be subject to the exclusive jurisdiction of the 
+                        courts of London, UK.
+                    </p>
+                </article>
+
+                <!-- تذييل البطاقة -->
+                <div class="pt-8 border-t border-base-200/60 text-center space-y-2">
+                    <p class="text-sm opacity-40 italic flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Violation of these terms may lead to account suspension or termination.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA SECTION (اختياري) ==================== -->
+    <section class="py-16 md:py-20 w-full bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+        <div class="max-w-3xl mx-auto px-4 md:px-8 text-center space-y-6 reveal">
+            <h2 class="text-2xl md:text-4xl font-black tracking-tight">
+                Have questions about our <span class="text-primary">Terms</span>?
+            </h2>
+            <p class="text-base md:text-lg opacity-70 max-w-2xl mx-auto">
+                Our legal team is happy to clarify any concerns. Reach out to us for more information.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 pt-2">
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-primary rounded-2xl px-10 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                    Contact Legal
+                </a>
+                <a asp-controller="Home" asp-action="Privacy" class="btn btn-outline rounded-2xl px-10">
+                    Privacy Policy
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>

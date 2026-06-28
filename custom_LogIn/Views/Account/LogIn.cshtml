@@ -1,0 +1,111 @@
+﻿@using custom_LogIn.ViewModels;
+@model LoginVM
+@{
+    Layout = "_AccountLayout";
+    ViewData["Title"] = "Welcome Back";
+}
+
+<!-- حاوية التوسيط -->
+<div class="flex items-center justify-center p-4 md:p-8 w-full min-h-[80vh]">
+    
+    <!-- الكارد الأساسي (تم ضبط الـ Padding والـ Grid ليطابق الصورة) -->
+    <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 bg-base-100 rounded-[2.5rem] shadow-2xl overflow-hidden border border-base-200">
+        
+        <!-- الجانب الأيسر (الألوان الأصلية) -->
+        <div class="hidden lg:flex flex-col justify-between p-12 bg-primary text-primary-content relative overflow-hidden">
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-black text-xl">C</div>
+                <span class="text-xl font-bold">ClinicFlow</span>
+            </div>
+            
+            <div class="space-y-6 relative z-10">
+                <h2 class="text-5xl font-black leading-tight tracking-tight">Your Health <br />Journey Starts <br />Here.</h2>
+                <p class="text-sm opacity-80 leading-relaxed max-w-sm">Log in to manage your appointments, view clinical records, and connect with your specialists.</p>
+            </div>
+
+            <div class="flex items-center gap-3 relative z-10">
+                <div class="avatar-group -space-x-4">
+                    <div class="avatar w-10"><img src="https://i.pravatar.cc/100?u=1" /></div>
+                    <div class="avatar w-10"><img src="https://i.pravatar.cc/100?u=2" /></div>
+                    <div class="avatar w-10"><img src="https://i.pravatar.cc/100?u=3" /></div>
+                </div>
+                <span class="text-sm font-bold opacity-80">Joined by 15k+ patients</span>
+            </div>
+        </div>
+
+        <!-- الجانب الأيمن (الفورم) -->
+        <div class="p-10 md:p-16 flex flex-col justify-center">
+            <div class="mb-8">
+                <h1 class="text-4xl font-black mb-2">Login</h1>
+                <p class="text-base-content/60">Welcome back! Please enter your details.</p>
+            </div>
+
+            <form asp-action="Login" method="post" class="space-y-5">
+                <div asp-validation-summary="ModelOnly" class="text-error text-sm" role="alert"></div>
+                <div class="form-control">
+                    <label class="label font-bold text-sm">Email Address</label>
+                    <input asp-for="Email" type="email" placeholder="email@example.com" class="input input-bordered w-full rounded-2xl h-14" />
+                    <span asp-validation-for="Email" class="text-error text-sm"></span>
+                </div>
+                
+                <div class="form-control">
+                        <label class="label font-bold text-sm">Password</label>
+                    <input asp-for="Password" type="password" placeholder="••••••••" class="input input-bordered w-full rounded-2xl h-14" />
+                    <span asp-validation-for="Password" class="text-error text-sm"></span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input asp-for ="RememberMe" type="checkbox" class="checkbox checkbox-primary checkbox-sm rounded-md" />
+                    <span class="text-sm font-medium opacity-60">Remember me</span>
+                </div>
+                    <div class="flex justify-between">
+                        <a href="#" class="text-xs font-bold text-primary hover:underline self-center">Forgot password?</a>
+                    </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-full rounded-2xl h-14 mt-4">Log In</button>
+
+
+            </form>
+            <div class="divider text-xs font-bold opacity-30 uppercase">
+                OR CONTINUE WITH
+            </div>
+
+            <form asp-controller="Account" asp-action="GoogleLogin" method="post" class="w-full">
+                <!-- إرسال الـ ReturnUrl -->
+                <input type="hidden" name="returnUrl" value="@Context.Request.Query["ReturnUrl"]" />
+
+                <button type="submit"
+                        class="btn bg-white hover:bg-gray-50 text-black border border-gray-300 w-full rounded-2xl h-14 gap-3 normal-case text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center">
+
+                    <!-- Google Logo -->
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 48 48"
+                         class="w-5 h-5">
+
+                        <path fill="#FFC107"
+                              d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12S17.4 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.7-.4-3.5z" />
+
+                        <path fill="#FF3D00"
+                              d="M6.3 14.7l6.6 4.8C14.7 16 19 12 24 12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+
+                        <path fill="#4CAF50"
+                              d="M24 44c5.2 0 10-2 13.5-5.4l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.8-3.3-11.5-8l-6.5 5C9.3 39.5 16 44 24 44z" />
+
+                        <path fill="#1976D2"
+                              d="M43.6 20.5H42V20H24v8h11.3c-1.1 3-3.3 5.3-6 6.8l6.2 5.2C39.9 36.3 44 30.7 44 24c0-1.3-.1-2.7-.4-3.5z" />
+                    </svg>
+
+                    Continue with Google
+                </button>
+            </form>
+            <p class="text-center text-sm mt-8 opacity-60">
+                Don't have an account? <a asp-action="Register" class="text-primary font-bold hover:underline">Register for free</a>
+            </p>
+        </div>
+    </div>
+</div>
+@section Scripts{
+@{
+        await Html.PartialAsync("_ValidationScriptsPartial.cshtml");
+    }
+}

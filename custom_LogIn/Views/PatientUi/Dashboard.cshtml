@@ -1,0 +1,156 @@
+﻿@{
+    Layout = "_PatientLayout";
+    ViewData["Title"] = "My Health Overview";
+
+    var appointments = Model.Items as IEnumerable<AppointmentDto> ?? new List<AppointmentDto>();
+    var total = Model.TotalCount;
+    var upcoming = appointments.Count(a => a.Status == AppointmentStatus.Confirmed || a.Status == AppointmentStatus.Pending);
+    var completed = appointments.Count(a => a.Status == AppointmentStatus.Completed);
+    var cancelled = appointments.Count(a => a.Status == AppointmentStatus.Canceled);
+}
+
+<div class="space-y-6">
+
+    <!-- ===== Header ===== -->
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight">Welcome back, <span class="text-primary">@User.Identity?.Name</span></h1>
+            <p class="text-sm text-base-content/60">Here's a quick overview of your appointments.</p>
+        </div>
+        <a asp-controller="DoctorsUI" asp-action="Index"
+               class="btn btn-primary btn-sm rounded-full px-5 shadow-sm shadow-primary/20 hover:shadow-primary/30 transition-all duration-200">
+            <span class="mr-1">+</span> Book New
+        </a>
+    </div>
+
+    <!-- ===== Stats ===== -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <!-- Total -->
+        <div class="bg-base-100 rounded-2xl border border-base-200/60 p-4 text-center hover:shadow-sm transition-shadow duration-200">
+            <div class="text-2xl font-bold">@total</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50">Total</div>
+        </div>
+        <!-- Upcoming -->
+        <div class="bg-base-100 rounded-2xl border border-base-200/60 p-4 text-center hover:shadow-sm transition-shadow duration-200">
+            <div class="text-2xl font-bold text-success">@upcoming</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50">Upcoming</div>
+        </div>
+        <!-- Completed -->
+        <div class="bg-base-100 rounded-2xl border border-base-200/60 p-4 text-center hover:shadow-sm transition-shadow duration-200">
+            <div class="text-2xl font-bold text-info">@completed</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50">Completed</div>
+        </div>
+        <!-- Cancelled -->
+        <div class="bg-base-100 rounded-2xl border border-base-200/60 p-4 text-center hover:shadow-sm transition-shadow duration-200">
+            <div class="text-2xl font-bold text-error">@cancelled</div>
+            <div class="text-xs font-semibold uppercase tracking-wider text-base-content/50">Cancelled</div>
+        </div>
+    </div>
+
+    <!-- ===== Appointments Table ===== -->
+    <div class="bg-base-100 rounded-2xl border border-base-200/60 p-4 overflow-hidden shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base font-semibold flex items-center gap-2">
+                <span>📋</span> Recent Appointments
+            </h2>
+            <span class="text-xs text-base-content/50">@appointments.Count() of @total</span>
+        </div>
+
+        @if (!appointments.Any())
+        {
+            <div class="text-center py-10">
+                <div class="text-5xl mb-2">🩺</div>
+                <p class="font-medium text-base-content/70">No appointments yet</p>
+                <a asp-controller="DoctorsUI" asp-action="Index"
+                       class="btn btn-primary btn-sm rounded-full px-5 mt-3 shadow-sm shadow-primary/20 hover:shadow-primary/30 transition-all duration-200">
+                    Find a Doctor
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto -mx-4 px-4">
+                <table class="table table-sm table-zebra">
+                    <thead>
+                        <tr class="text-xs uppercase text-base-content/50 border-b border-base-200/60">
+                            <th class="pb-2 font-semibold">Doctor</th>
+                            <th class="pb-2 font-semibold">Date</th>
+                            <th class="pb-2 font-semibold">Time</th>
+                            <th class="pb-2 font-semibold">Status</th>
+                            <th class="pb-2 font-semibold text-right">Fee</th>
+                            <th class="pb-2 font-semibold text-center">Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in appointments)
+                        {
+                            <tr class="hover:bg-base-200/50 transition-colors duration-150">
+                                <td>
+                                    <div class="font-medium">@item.DoctorName</div>
+                                    <div class="text-xs text-base-content/50">@item.SpecialtyName</div>
+                                </td>
+                                <td class="text-sm">@item.Date.ToString("MMM dd, yyyy")</td>
+                                <td class="text-sm">@item.StartTime.ToString("hh:mm tt")</td>
+                                <td>
+                                    <span class="badge badge-sm font-medium @(item.Status == AppointmentStatus.Confirmed ? "badge-success" :
+                                                                                                                          item.Status == AppointmentStatus.Pending ? "badge-warning" :
+                                                                                                                          item.Status == AppointmentStatus.Completed ? "badge-info" :
+                                                                                                                          item.Status == AppointmentStatus.Canceled ? "badge-error" : "badge-ghost")">
+                                        @item.Status
+                                    </span>
+                                </td>
+                                <td class="text-right font-medium text-sm">$@item.ConsultationFee</td>
+                                <td class="text-center">
+                                    @if (item.IsPaid)
+                                    {
+                                        <span class="badge badge-ghost badge-sm font-medium">✅ Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-ghost badge-sm font-medium">⏳ Pending</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="flex justify-center mt-4 pt-2 border-t border-base-200/50">
+                    <div class="join">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <a asp-action="Dashboard" asp-route-pageNumber="@(Model.PageNumber - 1)"
+                               class="join-item btn btn-ghost btn-sm hover:bg-primary/10 transition-colors">‹</a>
+                        }
+                        else
+                        {
+                            <span class="join-item btn btn-ghost btn-sm opacity-30">‹</span>
+                        }
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <a asp-action="Dashboard" asp-route-pageNumber="@i"
+                                   class="join-item btn btn-ghost btn-sm @(i == Model.PageNumber ? "btn-active bg-primary text-primary-content shadow-sm shadow-primary/20" : "hover:bg-primary/10") transition-colors">
+                                @i
+                            </a>
+                        }
+
+                        @if (Model.HasNextPage)
+                        {
+                            <a asp-action="Dashboard" asp-route-pageNumber="@(Model.PageNumber + 1)"
+                               class="join-item btn btn-ghost btn-sm hover:bg-primary/10 transition-colors">›</a>
+                        }
+                        else
+                        {
+                            <span class="join-item btn btn-ghost btn-sm opacity-30">›</span>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

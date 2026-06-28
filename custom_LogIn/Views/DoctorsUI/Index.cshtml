@@ -1,0 +1,273 @@
+﻿@model DoctorIndexVM
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Our Specialists";
+
+    var currentName = ViewData["Name"] as string;
+    var currentMaxPrice = ViewData["MaxPrice"] as decimal?;
+}
+
+@section Styles {
+    <style>
+        /* إلغاء padding الـ main */
+        main.container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* إلغاء margin-top الزائد من الفوتر */
+        footer {
+            margin-top: 0 !important;
+        }
+
+        /* منع التمرير الأفقي */
+        body {
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100% !important;
+        }
+
+        /* تنسيق الفلاتر الزجاجي */
+        .filter-glass {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="night"] .filter-glass,
+        [data-theme="dracula"] .filter-glass {
+            background: rgba(17, 24, 39, 0.55);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* تنسيق بطاقات الأطباء */
+        .doctor-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .doctor-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.2);
+            }
+
+        /* تنسيق الـ Range Slider */
+        input[type="range"].range-primary {
+            accent-color: var(--fallback-p, oklch(var(--p)));
+        }
+
+        /* تنسيق الـ Pagination */
+        .pagination-join {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        [data-theme="night"] .pagination-join,
+        [data-theme="dracula"] .pagination-join {
+            background: rgba(17, 24, 39, 0.5);
+        }
+
+        .pagination-join .btn-active {
+            background: var(--fallback-p, oklch(var(--p)));
+            color: var(--fallback-pc, oklch(var(--pc)));
+            border-color: var(--fallback-p, oklch(var(--p)));
+        }
+    </style>
+}
+
+<div class="w-full">
+
+    <!-- ==================== HERO / HEADER ==================== -->
+    <section class="pt-28 md:pt-32 pb-12 md:pb-16 bg-base-200/30 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 reveal">
+                <div>
+                    <!-- Breadcrumbs -->
+                    <div class="text-sm breadcrumbs opacity-50 mb-2">
+                        <ul>
+                            <li><a asp-controller="Home" asp-action="Index" class="hover:text-primary transition">Home</a></li>
+                            <li>Doctors</li>
+                        </ul>
+                    </div>
+                    <h1 class="text-5xl md:text-6xl font-black tracking-tight leading-tight">
+                        Meet Our <br class="hidden sm:block" />
+                        <span class="text-primary">Specialists</span>
+                    </h1>
+                    <p class="text-lg opacity-60 mt-3 max-w-2xl">
+                        Browse through <strong class="text-primary font-bold">@Model.Doctors.TotalCount</strong> verified medical professionals.
+                    </p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="badge badge-primary badge-lg gap-2 px-6 py-4 text-sm font-bold shadow-md shadow-primary/20">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                        Verified
+                    </span>
+                    <span class="badge badge-ghost badge-lg gap-2 px-6 py-4 text-sm font-bold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        @Model.Doctors.TotalCount Doctors
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== MAIN CONTENT (Filters + List) ==================== -->
+    <section class="py-8 md:py-12 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="flex flex-col lg:flex-row gap-10 lg:gap-14">
+
+                <!-- Sidebar Filters -->
+                <aside class="lg:w-80 xl:w-96 flex-shrink-0">
+                    <form method="get" class="space-y-6 sticky top-28">
+                        <div class="filter-glass p-6 md:p-8 rounded-3xl shadow-xl space-y-6">
+
+                            <h2 class="font-black text-xl flex items-center gap-2">
+                                <svg class="w-5 h-5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+                                Filter By
+                            </h2>
+
+                            <!-- Doctor Name -->
+                            <div class="form-control">
+                                <label class="label pb-1">
+                                    <span class="label-text font-bold text-xs uppercase tracking-widest opacity-50">Doctor Name</span>
+                                </label>
+                                <input name="name"
+                                       type="text"
+                                       value="@currentName"
+                                       placeholder="e.g. Smith"
+                                       class="input input-bordered rounded-xl w-full bg-base-100/50 backdrop-blur-sm border-base-200/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition" />
+                            </div>
+
+                            <!-- Specialty Dropdown -->
+                            <div class="form-control">
+                                <label class="label pb-1">
+                                    <span class="label-text font-bold text-xs uppercase tracking-widest opacity-50">Specialty</span>
+                                </label>
+                                <select name="specialtyId"
+                                        class="select select-bordered rounded-xl w-full bg-base-100/50 backdrop-blur-sm border-base-200/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition">
+                                    <option value="">All Specialties</option>
+                                    @foreach (var specialty in Model.Specialties)
+                                    {
+                                        if (Model.SelectedSpecialtyId == specialty.Id)
+                                        {
+                                            <option value="@specialty.Id" selected>@specialty.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@specialty.Id">@specialty.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Max Price -->
+                            <div class="form-control">
+                                <label class="label pb-1">
+                                    <span class="label-text font-bold text-xs uppercase tracking-widest opacity-50">Max Fee ($)</span>
+                                </label>
+                                <input name="maxPrice"
+                                       type="range"
+                                       value="@(currentMaxPrice ?? 1000)"
+                                       class="range range-primary w-full"
+                                       step="10"
+                                       min="0"
+                                       max="1000"
+                                       oninput="this.nextElementSibling.textContent = '$' + this.value" />
+                                <output class="text-center font-black mt-2 text-primary text-xl">
+                                    $@(currentMaxPrice ?? 1000)
+                                </output>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary w-full rounded-xl shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all h-12">
+                                Apply Filters
+                            </button>
+
+                            <a asp-action="Index"
+                                   class="btn btn-ghost btn-sm w-full opacity-50 hover:opacity-100 transition">
+                                Clear All
+                            </a>
+                        </div>
+                    </form>
+                </aside>
+
+                <!-- Main Listing -->
+                <div class="flex-1 space-y-8">
+
+                    @if (!Model.Doctors.Items.Any())
+                    {
+                        <div class="card bg-base-100 border border-dashed border-base-300 p-16 md:p-24 text-center rounded-3xl shadow-sm reveal">
+                            <div class="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center text-primary mx-auto mb-6">
+                                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <h3 class="text-3xl font-black mb-3">No results found</h3>
+                            <p class="text-lg opacity-60 max-w-md mx-auto">
+                                We couldn't find any doctors matching your current filters.
+                            </p>
+                            <div class="mt-8">
+                                <a asp-action="Index" class="btn btn-primary rounded-2xl px-10 shadow-lg shadow-primary/20">
+                                    Show All Doctors
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 reveal delay-200">
+                            @foreach (var doctor in Model.Doctors.Items)
+                            {
+                                <partial name="_DoctorCard" model="doctor" />
+                            }
+                        </div>
+
+                        @if (Model.Doctors.TotalCount > Model.Doctors.PageSize)
+                        {
+                            <div class="flex justify-center pt-8">
+                                <div class="join pagination-join shadow-sm border border-base-200/50 p-1 rounded-2xl backdrop-blur-sm">
+                                    @for (int i = 1; i <= (int)Math.Ceiling((double)Model.Doctors.TotalCount / Model.Doctors.PageSize); i++)
+                                    {
+                                        <a asp-action="Index"
+                                               asp-route-pageNumber="@i"
+                                               asp-route-name="@currentName"
+                                               asp-route-specialtyId="@Model.SelectedSpecialtyId"
+                                               asp-route-maxPrice="@currentMaxPrice"
+                                               class="join-item btn btn-ghost btn-sm md:btn-md @(i == Model.Doctors.PageNumber ? "btn-active !bg-primary !text-primary-content shadow-md shadow-primary/30" : "")">
+                                            @i
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA (Optional) ==================== -->
+    <section class="py-16 md:py-24 w-full bg-gradient-to-r from-primary/5 to-secondary/5 mt-4">
+        <div class="max-w-4xl mx-auto px-4 md:px-8 text-center reveal">
+            <h3 class="text-2xl md:text-3xl font-black">Can't find the right specialist?</h3>
+            <p class="text-base opacity-60 max-w-xl mx-auto mt-2">
+                Our team is here to help you find the perfect match for your healthcare needs.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 mt-6">
+                <a asp-controller="Home" asp-action="Contact" class="btn btn-primary btn-lg rounded-2xl px-12 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all">
+                    Contact Support
+                </a>
+                <a asp-controller="Home" asp-action="FAQ" class="btn btn-outline btn-lg rounded-2xl px-12">
+                    Visit FAQ
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>

@@ -1,0 +1,180 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Clinic_System
+
+@inject UserManager<User> UserManager
+
+<header id="mainNavbar"
+        class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 translate-y-0">
+    <div class="navbar glass-nav border-b border-base-200/60 px-4 md:px-8 shadow-sm">
+
+        <!-- LEFT -->
+        <div class="navbar-start">
+
+            <!-- MOBILE -->
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                         viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h8m-8 6h16" />
+                    </svg>
+                </div>
+
+                <ul tabindex="0"
+                    class="menu menu-sm dropdown-content mt-3 p-2 shadow-xl bg-base-100 rounded-2xl w-56 border border-base-200 z-[100]">
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="DoctorsUI" asp-action="Index">Doctors</a></li>
+                    <li><a asp-controller="SpecialtiesUI" asp-action="Index">Specialties</a></li>
+                    <li><a asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- LOGO -->
+            <a asp-controller="Home" asp-action="Index"
+                   class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white flex items-center justify-center font-black text-xl shadow-md group-hover:rotate-6 transition-transform duration-300">
+                    C
+                </div>
+                <div class="hidden sm:block">
+                    <span class="block text-xl font-black tracking-tight text-primary">ClinicFlow</span>
+                    <span class="block text-[11px] opacity-60 -mt-1">Smart Clinic System</span>
+                </div>
+            </a>
+        </div>
+
+        <!-- CENTER -->
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal gap-1 px-1 font-medium">
+                <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="Home" asp-action="Index">Home</a></li>
+                <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="DoctorsUI" asp-action="Index">Doctors</a></li>
+                <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="SpecialtiesUI" asp-action="Index">Specialties</a></li>
+                <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="Home" asp-action="About">About</a></li>
+                <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="Home" asp-action="Contact">Contact</a></li>
+            </ul>
+        </div>
+
+        <!-- RIGHT -->
+        <div class="navbar-end gap-2">
+
+            <!-- THEME -->
+            <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button"
+                     class="btn btn-ghost btn-sm rounded-xl gap-2 hover:bg-base-200 transition">
+
+                    🎨 <span class="text-sm font-semibold">Theme</span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         class="h-4 w-4 opacity-60"
+                         fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+
+                <ul tabindex="0"
+                    class="dropdown-content menu p-3 shadow-2xl bg-base-100/90 backdrop-blur-xl rounded-2xl w-52 mt-3 border border-base-200 z-[100]">
+
+                    <li>
+                        <button onclick="setTheme('winter')"
+                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                            <span class="w-3 h-3 rounded-full bg-sky-400"></span>
+                            Winter
+                        </button>
+                    </li>
+
+                    <li>
+                        <button onclick="setTheme('light')"
+                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                            <span class="w-3 h-3 rounded-full bg-yellow-300"></span>
+                            Light
+                        </button>
+                    </li>
+
+                    <li>
+                        <button onclick="setTheme('night')"
+                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                            <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                            Night
+                        </button>
+                    </li>
+
+                    <li>
+                        <button onclick="setTheme('dracula')"
+                                class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                            <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                            Dracula
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="dropdown dropdown-end">
+                    <label tabindex="0"
+                           class="flex items-center gap-3 px-3 py-2 rounded-full bg-base-200 hover:bg-base-300 transition cursor-pointer">
+
+                        <!-- Avatar -->
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                            @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")
+                        </div>
+
+                        <!-- Name -->
+                        <span class="text-sm font-semibold">
+                            @(User.Identity?.Name?.Split(' ')[0] ?? "User")
+                        </span>
+
+                        <!-- Arrow -->
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-4 w-4 opacity-60"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </label>
+
+                    <ul tabindex="0"
+                        class="dropdown-content menu p-3 shadow-xl bg-base-100/90 backdrop-blur-xl rounded-2xl w-52 mt-3 border border-base-200 z-[100]">
+
+                        <li>
+                            <a asp-controller="PatientUi" asp-action="Profile">
+                                👤 Profile
+                            </a>
+                        </li>
+
+                        <li>
+                            <a asp-controller="PatientUi" asp-action="Dashboard">
+                                📊 Dashboard
+                            </a>
+                        </li>
+
+                        <li class="border-t mt-1 pt-1">
+                            <a asp-controller="Account" asp-action="Logout"
+                                   class="text-error font-semibold">
+                                🚪 Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="flex items-center gap-2">
+                    <a asp-controller="Account"
+                           asp-action="Login"
+                           class="btn btn-ghost btn-sm rounded-xl px-5 hover:bg-base-200 transition">
+                        Log In
+                    </a>
+
+                    <a asp-controller="Account"
+                           asp-action="Register"
+                           class="btn btn-primary btn-sm rounded-xl px-5 shadow-lg shadow-primary/20 hover:scale-[1.02] transition">
+                        Sign Up
+                    </a>
+                </div>
+            }
+        </div>
+
+    </div>
+</header>

@@ -1,0 +1,399 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="winter">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>@ViewData["Title"] - ClinicFlow</title>
+
+    <!-- DaisyUI + Tailwind CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@latest/dist/full.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, #2563eb, #38bdf8);
+            z-index: 9999;
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .glass-card {
+            background: rgba(255,255,255,.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,.25);
+        }
+
+        [data-theme="night"] .glass-card,
+        [data-theme="dark"] .glass-card,
+        [data-theme="dracula"] .glass-card {
+            background: rgba(17,24,39,.55);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        [data-theme="night"] .glass-nav,
+        [data-theme="dracula"] .glass-nav,
+        [data-theme="dark"] .glass-nav {
+            background: rgba(17, 24, 39, 0.72);
+        }
+
+        .page-bg {
+            background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.10), transparent 25%), radial-gradient(circle at top right, rgba(14, 165, 233, 0.10), transparent 25%), radial-gradient(circle at bottom center, rgba(96, 165, 250, 0.08), transparent 30%);
+        }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body class="min-h-screen bg-base-100 text-base-content flex flex-col page-bg">
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+
+        var firstLetter =
+        !string.IsNullOrWhiteSpace(User.Identity?.Name)
+        ? User.Identity.Name[0].ToString().ToUpper()
+        : "U";
+    }
+    <!-- HEADER -->
+    <header id="mainNavbar"
+            class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 translate-y-0">
+        <div class="navbar glass-nav border-b border-base-200/60 px-4 md:px-8 shadow-sm">
+
+            <!-- LEFT -->
+            <div class="navbar-start">
+
+                <!-- MOBILE -->
+                <div class="dropdown">
+                    <div tabindex="0" role="button" class="btn btn-ghost lg:hidden rounded-xl">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 6h16M4 12h8m-8 6h16" />
+                        </svg>
+                    </div>
+
+                    <ul tabindex="0"
+                        class="menu menu-sm dropdown-content mt-3 p-2 shadow-xl bg-base-100 rounded-2xl w-56 border border-base-200 z-[100]">
+                        <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                        <li><a asp-controller="DoctorsUI" asp-action="Index">Doctors</a></li>
+                        <li><a asp-controller="SpecialtiesUI" asp-action="Index">Specialties</a></li>
+                        <li><a asp-controller="Home" asp-action="About">About</a></li>
+                        <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- LOGO -->
+                <a asp-controller="Home" asp-action="Index"
+                   class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-sky-400 text-white flex items-center justify-center font-black text-xl shadow-md group-hover:rotate-6 group-hover:scale-105 transition-all duration-300">
+                        C
+                    </div>
+                    <div class="hidden sm:block">
+                        <span class="block text-xl font-black tracking-tight text-primary">ClinicFlow</span>
+                        <span class="block text-[11px] opacity-60 -mt-1">Smart Clinic System</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- CENTER -->
+            <div class="navbar-center hidden lg:flex">
+                <ul class="menu menu-horizontal gap-1 px-1 font-medium">
+                    <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="DoctorsUI" asp-action="Index">Doctors</a></li>
+                    <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="SpecialtiesUI" asp-action="Index" ">Specialties</a></li>
+                    <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="Home" asp-action="About">About</a></li>
+                    <li><a class="rounded-xl hover:text-primary hover:bg-primary/10 transition" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                </ul>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="navbar-end gap-2">
+
+                <!-- THEME -->
+                <div class="dropdown dropdown-end">
+                    <div tabindex="0" role="button"
+                         class="btn btn-ghost btn-sm rounded-xl gap-2 hover:bg-base-200 transition">
+
+                        🎨 <span class="text-sm font-semibold">Theme</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             class="h-4 w-4 opacity-60"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+
+                    <ul tabindex="0"
+                        class="dropdown-content menu p-3 shadow-2xl bg-base-100/90 backdrop-blur-xl rounded-2xl w-52 mt-3 border border-base-200 z-[100]">
+
+                        <li>
+                            <button onclick="setTheme('winter')"
+                                    class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                                <span class="w-3 h-3 rounded-full bg-sky-400"></span>
+                                Winter
+                            </button>
+                        </li>
+
+                        <li>
+                            <button onclick="setTheme('light')"
+                                    class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                                <span class="w-3 h-3 rounded-full bg-yellow-300"></span>
+                                Light
+                            </button>
+                        </li>
+
+                        <li>
+                            <button onclick="setTheme('night')"
+                                    class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                                <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                                Night
+                            </button>
+                        </li>
+
+                        <li>
+                            <button onclick="setTheme('dracula')"
+                                    class="flex items-center gap-3 p-2 rounded-xl hover:bg-base-200 transition">
+                                <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+                                Dracula
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0"
+                               class="flex items-center gap-3 px-3 py-2 rounded-full bg-base-200 hover:bg-base-300 transition cursor-pointer">
+
+                            <!-- Avatar -->
+                            <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")
+                            </div>
+
+                            <!-- Name -->
+                            <span class="text-sm font-semibold">
+                                @(User.Identity?.Name?.Split(" ")[0] ?? "Account")
+                            </span>
+
+                            <!-- Arrow -->
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                 class="h-4 w-4 opacity-60"
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </label>
+
+                        <ul tabindex="0"
+                            class="dropdown-content menu p-3 shadow-xl bg-base-100/90 backdrop-blur-xl rounded-2xl w-52 mt-3 border border-base-200">
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li>
+                                    <a asp-controller="AdminUI" asp-action="Profile">
+                                        👤 Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="AdminUI" asp-action="Dashboard">
+                                        📊 Dashboard
+                                    </a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Doctor"))
+                            {
+                                <li>
+                                    <a asp-controller="DoctorsUI" asp-action="Profile">
+                                        👤 Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="DoctorsUI" asp-action="Dashboard">
+                                        📊 Dashboard
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a asp-controller="PatientUi" asp-action="Profile">
+                                        👤 Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="PatientUi" asp-action="Dashboard">
+                                        📊 Dashboard
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="border-t mt-2 pt-2">
+                                <a asp-controller="Account" asp-action="Logout"
+                                   class="text-error font-semibold hover:bg-base-200 rounded-xl">
+                                    🚪 Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex items-center gap-2">
+
+                        <a asp-controller="Account"
+                           asp-action="Login"
+                           class="btn btn-ghost btn-md rounded-full px-5 hover:bg-base-200 transition">
+                            Log In
+                        </a>
+
+                        <a asp-controller="Account"
+                           asp-action="Register"
+                           class="btn btn-primary btn-md rounded-full px-5 shadow-md shadow-primary/20 hover:scale-[1.02] transition">
+                            Sign Up
+                        </a>
+
+                    </div>
+                }
+    </header>
+
+    <!-- CONTENT -->
+    <main class="flex-1 container mx-auto px-4 py-6 pt-24 md:pt-28">
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-base-200 pt-20 pb-10 border-t border-base-300 mt-20">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            <div class="space-y-6">
+                <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-primary-content font-black text-xl">C</div>
+                    <span class="text-xl font-black tracking-tight">ClinicFlow</span>
+                </a>
+                <p class="text-base-content/60 leading-relaxed">
+                    Revolutionizing healthcare accessibility by connecting patients with top-tier specialists through a secure, intuitive digital platform.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" /></svg></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center hover:bg-primary hover:text-primary-content transition-all"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.058-1.69-.072-4.949-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg></a>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-8">Navigation</h3>
+                <ul class="space-y-4 font-medium opacity-70 text-sm">
+                    <li><a asp-controller="DoctorsUI" asp-action="Index" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Find a Doctor</a></li>
+                    <li><a asp-controller="SpecialtiesUI" asp-action="Index" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Medical Specialties</a></li>
+                    <li><a asp-controller="Home" asp-action="About" class="hover:text-primary hover:translate-x-1 inline-block transition-all">About Our Platform</a></li>
+                    <li><a asp-controller="Home" asp-action="FAQ" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Frequently Asked Questions</a></li>
+                </ul>
+            </div>
+
+            <div class="lg:col-span-1">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-8">Support</h3>
+                <ul class="space-y-4 font-medium opacity-70 text-sm">
+                    <li><a asp-controller="Home" asp-action="Contact" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Contact Support</a></li>
+                    <li><a asp-controller="Home" asp-action="Privacy" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Privacy Policy</a></li>
+                    <li><a asp-controller="Home" asp-action="Terms" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-primary hover:translate-x-1 inline-block transition-all">Doctor Portal</a></li>
+                </ul>
+            </div>
+
+            <div class="lg:col-span-1">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-8">Newsletter</h3>
+                <p class="text-sm opacity-60 mb-6">Stay updated with the latest health tips and clinical news.</p>
+                <div class="join w-full">
+                    <input class="input input-bordered join-item w-full focus:outline-none focus:border-primary" placeholder="Email Address" />
+                    <button class="btn btn-primary join-item px-6">Join</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 md:px-8 pt-10 border-t border-base-300 flex flex-col md:flex-row justify-between items-center gap-6 opacity-40 text-xs font-bold uppercase tracking-widest">
+            <p>© 2026 ClinicFlow Inc. All rights reserved.</p>
+            <div class="flex gap-8">
+                <span>ISO 27001 Certified</span>
+                <span>Secure Payments by Stripe</span>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- SCRIPTS -->
+    <script>
+        function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+        document.documentElement.setAttribute("data-theme", saved);
+        }
+
+        const navbar = document.getElementById("mainNavbar");
+        const progress = document.getElementById("scroll-progress");
+        let lastScrollY = window.scrollY;
+
+        window.addEventListener("scroll", () => {
+        const currentScrollY = window.scrollY;
+
+        // Scroll progress
+        const winScroll = document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        progress.style.width = scrolled + "%";
+
+        // Navbar shadow on scroll
+        if (currentScrollY > 10) {
+        navbar.classList.add("shadow-lg");
+        } else {
+        navbar.classList.remove("shadow-lg");
+        }
+
+        // Hide on scroll down / Show on scroll up
+        if (currentScrollY > lastScrollY && currentScrollY > 90) {
+        navbar.classList.remove("translate-y-0");
+        navbar.classList.add("-translate-y-full");
+        } else {
+        navbar.classList.remove("-translate-y-full");
+        navbar.classList.add("translate-y-0");
+        }
+
+        lastScrollY = currentScrollY;
+        });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    @await Html.PartialAsync("_NotificationPartial")
+
+</body>
+</html>

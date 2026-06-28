@@ -1,0 +1,182 @@
+﻿@model UpdateDoctorProfileDto
+
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "My Profile";
+
+    var profile = ViewBag.Profile as DoctorProfileDto;
+}
+
+<div class="space-y-8">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold">👨‍⚕️ My Profile</h1>
+            <p class="text-base-content/60">
+                Manage your professional information and account settings.
+            </p>
+        </div>
+
+        <div class="avatar placeholder">
+            <div class="bg-primary text-primary-content rounded-full w-20">
+                <span class="text-3xl">
+                    @(profile?.FullName?.FirstOrDefault().ToString().ToUpper())
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doctor Information -->
+    <div class="grid lg:grid-cols-4 gap-4">
+
+        <div class="stat bg-base-100 rounded-2xl shadow border">
+            <div class="stat-title">⭐ Rating</div>
+            <div class="stat-value text-warning">
+                @(profile?.AverageRating.ToString("0.0"))
+            </div>
+        </div>
+
+        <div class="stat bg-base-100 rounded-2xl shadow border">
+            <div class="stat-title">Reviews</div>
+            <div class="stat-value">
+                @profile?.ReviewsCount
+            </div>
+        </div>
+
+        <div class="stat bg-base-100 rounded-2xl shadow border">
+            <div class="stat-title">Email</div>
+            <div class="stat-value text-lg">
+                @profile?.Email
+            </div>
+        </div>
+
+        <div class="stat bg-base-100 rounded-2xl shadow border">
+            <div class="stat-title">Birth Date</div>
+            <div class="stat-value text-lg">
+                @profile?.DateOfBirth.ToString("dd MMM yyyy")
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+
+        <!-- Update Profile -->
+        <div class="card bg-base-100 shadow-xl border">
+
+            <div class="card-body">
+
+                <h2 class="card-title">
+                    ✏️ Update Profile
+                </h2>
+
+                <form asp-action="Profile" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="alert alert-error mb-4">
+                    </div>
+
+                    <div class="space-y-5">
+
+                        <div>
+                            <label class="label">
+                                <span class="label-text">
+                                    Full Name
+                                </span>
+                            </label>
+
+                            <input class="input input-bordered w-full"
+                                   value="@profile?.FullName"
+                                   disabled />
+                        </div>
+
+                        <div>
+                            <label asp-for="Specialization"
+                                   class="label">
+                            </label>
+
+                            <input asp-for="Specialization"
+                                   class="input input-bordered w-full" />
+
+                            <span asp-validation-for="Specialization"
+                                  class="text-error text-sm">
+                            </span>
+                        </div>
+
+                        <div>
+                            <label asp-for="ExperienceYears"
+                                   class="label">
+                            </label>
+
+                            <input asp-for="ExperienceYears"
+                                   class="input input-bordered w-full" />
+
+                            <span asp-validation-for="ExperienceYears"
+                                  class="text-error text-sm">
+                            </span>
+                        </div>
+
+                        <div>
+                            <label asp-for="ConsultationFee"
+                                   class="label">
+                            </label>
+
+                            <input asp-for="ConsultationFee"
+                                   class="input input-bordered w-full" />
+
+                            <span asp-validation-for="ConsultationFee"
+                                  class="text-error text-sm">
+                            </span>
+                        </div>
+
+                        <div>
+
+                            <label asp-for="Bio"
+                                   class="label">
+                            </label>
+
+                            <textarea asp-for="Bio"
+                                      rows="6"
+                                      class="textarea textarea-bordered w-full">
+                            </textarea>
+
+                            <span asp-validation-for="Bio"
+                                  class="text-error text-sm">
+                            </span>
+
+                        </div>
+
+                        <button class="btn btn-primary w-full">
+                            💾 Save Changes
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="flex items-center justify-center">
+
+            <a asp-controller="DoctorsUI"
+               asp-action="ChangePassword"
+               class="btn btn-warning w-full">
+
+                🔑 Change Password
+
+            </a>
+
+        </div>
+        </div>
+
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,54 @@
+@model Clinic_System.CancelAppointmentDto
+
+@{
+    ViewData["Title"] = "Cancel Appointment";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0"><i class="bi bi-x-circle me-2"></i>Cancel Appointment</h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Are you sure?</strong> This action cannot be undone.
+                Appointments can only be cancelled at least <strong>2 hours</strong> before the scheduled time.
+            </div>
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+
+            <form asp-action="CancelAppointment" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="AppointmentId" />
+
+                <div class="mb-3">
+                    <label asp-for="Reason" class="form-label fw-semibold">
+                        Reason for Cancellation <span class="text-danger">*</span>
+                    </label>
+                    <textarea asp-for="Reason"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Please describe why you are cancelling this appointment (min. 10 characters)…"></textarea>
+                    <span asp-validation-for="Reason" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-lg me-1"></i>Confirm Cancellation
+                    </button>
+                    <a asp-action="Dashboard" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Go Back
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

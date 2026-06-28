@@ -1,0 +1,65 @@
+﻿@model Clinic_System.CreateScheduleDto
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "Add Schedule Slot";
+}
+
+<div class="max-w-lg mx-auto space-y-5">
+
+    <div>
+        <h1 class="text-xl font-black tracking-tight">🕒 Add Schedule Slot</h1>
+        <p class="text-xs opacity-40 mt-0.5">Define a time slot when patients can book appointments.</p>
+    </div>
+
+    <div class="rounded-2xl border border-base-200/60 bg-base-100/60 backdrop-blur shadow-sm p-6">
+        <form asp-action="Create" method="post" class="space-y-4">
+            @Html.AntiForgeryToken()
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-error rounded-xl text-sm border-0">
+                    <div class="flex flex-col gap-1">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <span>⚠️ @error.ErrorMessage</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="form-control">
+                <label class="label font-semibold text-sm pb-1">Date</label>
+                <input asp-for="Day" type="date"
+                       min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                       class="input input-bordered rounded-xl w-full" />
+                <span asp-validation-for="Day" class="text-error text-xs mt-1"></span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label font-semibold text-sm pb-1">Start Time</label>
+                    <input asp-for="StartTime" type="time"
+                           class="input input-bordered rounded-xl w-full" />
+                    <span asp-validation-for="StartTime" class="text-error text-xs mt-1"></span>
+                </div>
+                <div class="form-control">
+                    <label class="label font-semibold text-sm pb-1">End Time</label>
+                    <input asp-for="EndTime" type="time"
+                           class="input input-bordered rounded-xl w-full" />
+                    <span asp-validation-for="EndTime" class="text-error text-xs mt-1"></span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button type="submit" class="btn btn-primary btn-sm rounded-full px-6 shadow shadow-primary/20">
+                    💾 Save Slot
+                </button>
+                <a asp-action="Index" class="btn btn-ghost btn-sm rounded-full px-6">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

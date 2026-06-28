@@ -1,0 +1,487 @@
+﻿@model Clinic_System.AdminDashboardDto
+@using Clinic_System
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
+    var adminFirstName = User.Identity?.Name?.Split(" ")[0] ?? "Admin";
+    var hour = DateTime.UtcNow.Hour;
+    var greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+}
+
+@section Styles {
+    <style>
+        .stat-card {
+            border-radius: 1.25rem;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid rgba(255,255,255,.2);
+            transition: transform .2s ease, box-shadow .2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .stat-card::after {
+                content: '';
+                position: absolute;
+                top: -30%;
+                right: -10%;
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.08);
+            }
+
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px -8px rgba(0,0,0,.2);
+            }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            opacity: .75;
+            margin-top: .2rem;
+        }
+
+        .section-card {
+            background: rgba(255,255,255,.55);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 1.25rem;
+            padding: 1.25rem 1.5rem;
+        }
+
+        [data-theme="night"] .section-card,
+        [data-theme="dracula"] .section-card {
+            background: rgba(17,24,39,.45);
+            border-color: rgba(255,255,255,.08);
+        }
+
+        .section-heading {
+            font-size: .9rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            padding-bottom: .75rem;
+            border-bottom: 1px solid rgba(0,0,0,.06);
+        }
+
+        [data-theme="night"] .section-heading,
+        [data-theme="dracula"] .section-heading {
+            border-bottom-color: rgba(255,255,255,.06);
+        }
+
+        /* donut chart */
+        .donut-wrap {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            flex-shrink: 0;
+        }
+
+            .donut-wrap svg {
+                transform: rotate(-90deg);
+            }
+
+        .donut-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.35rem;
+            line-height: 1;
+        }
+
+            .donut-center small {
+                font-size: .58rem;
+                font-weight: 600;
+                opacity: .45;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+            }
+
+        /* bar chart */
+        .bar-group {
+            display: flex;
+            align-items: flex-end;
+            gap: .5rem;
+            height: 120px;
+        }
+
+        .bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .3rem;
+            flex: 1;
+        }
+
+        .bar-track {
+            width: 100%;
+            background: oklch(var(--b2));
+            border-radius: .4rem .4rem 0 0;
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+            flex: 1;
+        }
+
+        .bar-fill {
+            width: 100%;
+            background: linear-gradient(180deg, oklch(var(--p)), oklch(var(--p)/.55));
+            border-radius: .4rem .4rem 0 0;
+            transition: height .8s cubic-bezier(.4,0,.2,1);
+            min-height: 2px;
+        }
+
+        .bar-lbl {
+            font-size: .58rem;
+            font-weight: 700;
+            opacity: .45;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .bar-val {
+            font-size: .62rem;
+            font-weight: 700;
+            color: oklch(var(--p));
+        }
+
+        /* top doctors */
+        .doc-row {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .55rem .4rem;
+            border-radius: .75rem;
+            transition: background .15s ease;
+        }
+
+            .doc-row:hover {
+                background: oklch(var(--b2)/.5);
+            }
+
+        .doc-av {
+            width: 34px;
+            height: 34px;
+            border-radius: 9999px;
+            background: oklch(var(--p));
+            color: oklch(var(--pc));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: .8rem;
+            flex-shrink: 0;
+        }
+
+        /* legend dot */
+        .ldot {
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* table */
+        .apt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .apt-table th {
+                font-size: .62rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                opacity: .4;
+                padding: 0 .5rem .6rem;
+                text-align: left;
+            }
+
+            .apt-table td {
+                font-size: .84rem;
+                padding: .55rem .5rem;
+                vertical-align: middle;
+            }
+
+            .apt-table tbody tr {
+                border-top: 1px solid rgba(0,0,0,.04);
+                transition: background .1s;
+            }
+
+                .apt-table tbody tr:hover {
+                    background: oklch(var(--b2)/.35);
+                }
+
+        [data-theme="night"] .apt-table tbody tr,
+        [data-theme="dracula"] .apt-table tbody tr {
+            border-top-color: rgba(255,255,255,.04);
+        }
+    </style>
+}
+
+<div class="space-y-5">
+
+    @* ── Header ── *@
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-xl font-black tracking-tight">
+                @greeting, <span class="text-primary">@adminFirstName</span> 👋
+            </h1>
+            <p class="text-xs opacity-40 mt-0.5 font-mono">@DateTime.UtcNow.ToString("dddd, MMMM dd yyyy · HH:mm UTC")</p>
+        </div>
+        <a asp-controller="DoctorsUI" asp-action="Index"
+           class="btn btn-primary btn-sm rounded-full px-5 shadow shadow-primary/20 hover:shadow-primary/40 transition-all text-xs">
+            + New Appointment
+        </a>
+    </div>
+
+    @* ── KPI Cards ── *@
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <span class="text-3xl">🧑‍⚕️</span>
+            <div><div class="stat-value">@Model.TotalPatients</div><div class="stat-label">Patients</div></div>
+        </div>
+        <div class="stat-card bg-gradient-to-br from-violet-500 to-violet-700 text-white">
+            <span class="text-3xl">👨‍⚕️</span>
+            <div><div class="stat-value">@Model.TotalDoctors</div><div class="stat-label">Doctors</div></div>
+        </div>
+        <div class="stat-card bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+            <span class="text-3xl">📅</span>
+            <div><div class="stat-value">@Model.TotalAppointments</div><div class="stat-label">Appointments</div></div>
+        </div>
+        <div class="stat-card bg-gradient-to-br from-amber-400 to-orange-500 text-white">
+            <span class="text-3xl">💰</span>
+            <div><div class="stat-value">$@Model.TotalRevenue.ToString("N0")</div><div class="stat-label">Revenue</div></div>
+        </div>
+    </div>
+
+    @* ── Donut + Bar chart ── *@
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        @* Appointment status donut *@
+        <div class="section-card">
+            <div class="section-heading">📊 Appointment Breakdown</div>
+            @{
+                double safeTotal = Model.TotalAppointments > 0 ? (double)Model.TotalAppointments : 1;
+                double circ = 339.3;
+                // arc lengths
+                double arcPending = Model.PendingAppointments / safeTotal * circ;
+                double arcConfirmed = Model.ConfirmedAppointments / safeTotal * circ;
+                double arcCompleted = Model.CompletedAppointments / safeTotal * circ;
+                double arcCancelled = Model.CancelledAppointments / safeTotal * circ;
+                // offsets (cumulative, negative because SVG goes clockwise after rotate(-90))
+                double offConfirmed = arcPending;
+                double offCompleted = arcPending + arcConfirmed;
+                double offCancelled = arcPending + arcConfirmed + arcCompleted;
+
+                string F(double v) => v.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture);
+            }
+            <div class="flex items-center gap-6 flex-wrap">
+                <div class="donut-wrap">
+                    <svg viewBox="0 0 120 120" width="130" height="130" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="60" cy="60" r="54" fill="none" stroke="oklch(var(--b2))" stroke-width="13" />
+                        @if (Model.PendingAppointments > 0)
+                        {
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#f59e0b" stroke-width="13"
+                                    stroke-dasharray="@F(arcPending) @F(circ - arcPending)"
+                                    stroke-dashoffset="0" />
+                        }
+                        @if (Model.ConfirmedAppointments > 0)
+                        {
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#22c55e" stroke-width="13"
+                                    stroke-dasharray="@F(arcConfirmed) @F(circ - arcConfirmed)"
+                                    stroke-dashoffset="-@F(offConfirmed)" />
+                        }
+                        @if (Model.CompletedAppointments > 0)
+                        {
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#38bdf8" stroke-width="13"
+                                    stroke-dasharray="@F(arcCompleted) @F(circ - arcCompleted)"
+                                    stroke-dashoffset="-@F(offCompleted)" />
+                        }
+                        @if (Model.CancelledAppointments > 0)
+                        {
+                            <circle cx="60" cy="60" r="54" fill="none" stroke="#f87171" stroke-width="13"
+                                    stroke-dasharray="@F(arcCancelled) @F(circ - arcCancelled)"
+                                    stroke-dashoffset="-@F(offCancelled)" />
+                        }
+                    </svg>
+                    <div class="donut-center">@Model.TotalAppointments<small>total</small></div>
+                </div>
+
+                <div class="flex flex-col gap-2.5 text-sm flex-1 min-w-[130px]">
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="flex items-center gap-2"><span class="ldot bg-amber-400"></span>Pending</span>
+                        <span class="font-bold">@Model.PendingAppointments</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="flex items-center gap-2"><span class="ldot bg-green-500"></span>Confirmed</span>
+                        <span class="font-bold">@Model.ConfirmedAppointments</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="flex items-center gap-2"><span class="ldot bg-sky-400"></span>Completed</span>
+                        <span class="font-bold">@Model.CompletedAppointments</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-4">
+                        <span class="flex items-center gap-2"><span class="ldot bg-red-400"></span>Cancelled</span>
+                        <span class="font-bold">@Model.CancelledAppointments</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Monthly revenue bar chart *@
+        <div class="section-card">
+            <div class="section-heading">📈 Monthly Revenue <span class="text-xs font-normal opacity-40 ml-1">(last 6 months)</span></div>
+            @if (!Model.MonthlyRevenue.Any())
+            {
+                <div class="text-center py-8 opacity-30 text-sm">No revenue data yet.</div>
+            }
+            else
+            {
+                var maxRev = (double)Model.MonthlyRevenue.Max(m => m.Revenue);
+                <div class="bar-group">
+                    @foreach (var m in Model.MonthlyRevenue)
+                    {
+                        var pct = maxRev > 0 ? (double)m.Revenue / maxRev * 100 : 0;
+                        <div class="bar-col">
+                            <div class="bar-val">$@((m.Revenue / 1000).ToString("0.#"))k</div>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="height:@pct.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            </div>
+                            <div class="bar-lbl">@m.Month.Split(' ')[0]</div>
+                        </div>
+                    }
+                </div>
+                <div class="text-right text-xs opacity-30 mt-2 font-mono">
+                    6-month total: $@Model.MonthlyRevenue.Sum(m => m.Revenue).ToString("N0")
+                </div>
+            }
+        </div>
+    </div>
+
+    @* ── Top Doctors + Recent Payments ── *@
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <div class="section-card">
+            <div class="section-heading">🏆 Top Doctors</div>
+            @if (!Model.TopDoctors.Any())
+            {
+                <div class="text-center py-8 opacity-30 text-sm">No data yet.</div>
+            }
+            else
+            {
+                @foreach (var (doc, idx) in Model.TopDoctors.Select((d, i) => (d, i + 1)))
+                {
+                    <div class="doc-row">
+                        <span class="text-xs font-black opacity-20 w-4 text-right">#@idx</span>
+                        <div class="doc-av">@doc.FullName[0]</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-semibold text-sm truncate">@doc.FullName</div>
+                            <div class="text-xs opacity-40">@doc.Specialty · ⭐ @doc.AverageRating.ToString("0.0")</div>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <div class="text-sm font-bold text-success">$@doc.Revenue.ToString("N0")</div>
+                            <div class="text-xs opacity-40">@doc.AppointmentCount appts</div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="section-card">
+            <div class="section-heading">💳 Recent Payments</div>
+            @if (!Model.RecentPayments.Any())
+            {
+                <div class="text-center py-8 opacity-30 text-sm">No payments yet.</div>
+            }
+            else
+            {
+                <table class="apt-table">
+                    <thead>
+                        <tr><th>Patient</th><th>Date</th><th class="text-right">Amount</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in Model.RecentPayments)
+                        {
+                            <tr>
+                                <td class="font-medium">@p.PatientName</td>
+                                <td class="opacity-40 text-xs">@p.PaidAt.ToString("MMM dd · hh:mm tt")</td>
+                                <td class="text-right font-bold text-success">$@p.Amount.ToString("N2")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    @* ── Recent Appointments ── *@
+    <div class="section-card">
+        <div class="section-heading">📋 Recent Appointments</div>
+        @if (!Model.RecentAppointments.Any())
+        {
+            <div class="text-center py-10 opacity-30">
+                <div class="text-4xl mb-2">📭</div>
+                <p class="text-sm">No appointments yet.</p>
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto -mx-6 px-6">
+                <table class="apt-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Date & Time</th>
+                            <th>Status</th>
+                            <th class="text-center">Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var a in Model.RecentAppointments)
+                        {
+                            var (badgeCss, statusLabel) = a.Status switch
+                            {
+                                AppointmentStatus.Confirmed => ("badge-success", "Confirmed"),
+                                AppointmentStatus.Pending => ("badge-warning", "Pending"),
+                                AppointmentStatus.Completed => ("badge-info", "Completed"),
+                                AppointmentStatus.Canceled => ("badge-error", "Cancelled"),
+                                _ => ("badge-ghost", a.Status.ToString())
+                            };
+                            <tr>
+                                <td class="font-mono text-xs opacity-25">#@a.Id</td>
+                                <td class="font-semibold">@a.PatientName</td>
+                                <td class="opacity-50">@a.DoctorName</td>
+                                <td class="text-xs opacity-50">@a.Date.ToString("MMM dd, yyyy · hh:mm tt")</td>
+                                <td><span class="badge @badgeCss badge-sm font-semibold">@statusLabel</span></td>
+                                <td class="text-center">@(a.IsPaid ? "✅" : Html.Raw("<span class='opacity-20'>⏳</span>"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+</div>

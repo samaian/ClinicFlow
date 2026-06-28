@@ -1,0 +1,300 @@
+﻿@model List<SpecialtyDto>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Medical Specialties";
+}
+
+@section Styles {
+    <style>
+        /* إلغاء padding الـ main */
+        main.container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* إلغاء margin-top الزائد من الفوتر */
+        footer {
+            margin-top: 0 !important;
+        }
+
+        /* منع التمرير الأفقي */
+        body {
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100% !important;
+        }
+
+        /* تنسيق بطاقة التخصص */
+        .specialty-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--fallback-b1, oklch(var(--b1)));
+            border: 1px solid var(--fallback-b2, oklch(var(--b2)/0.3));
+            border-radius: 1.5rem;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .specialty-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+                border-color: var(--fallback-p, oklch(var(--p)/0.4));
+            }
+
+            .specialty-card .icon-wrapper {
+                width: 4rem;
+                height: 4rem;
+                border-radius: 1rem;
+                background: var(--fallback-p, oklch(var(--p)/0.08));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--fallback-p, oklch(var(--p)));
+                font-size: 1.75rem;
+                margin-bottom: 1rem;
+                transition: all 0.3s ease;
+            }
+
+            .specialty-card:hover .icon-wrapper {
+                background: var(--fallback-p, oklch(var(--p)));
+                color: var(--fallback-pc, oklch(var(--pc)));
+                transform: scale(1.05) rotate(-3deg);
+            }
+
+            .specialty-card .specialty-name {
+                font-size: 1.25rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                line-height: 1.3;
+            }
+
+            .specialty-card .specialty-desc {
+                font-size: 0.9rem;
+                opacity: 0.6;
+                line-height: 1.6;
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .specialty-card .specialty-count {
+                font-size: 0.75rem;
+                font-weight: 600;
+                opacity: 0.5;
+                margin-top: 1rem;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+            /* تأثير وميض عند hover */
+            .specialty-card::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(135deg, var(--fallback-p, oklch(var(--p)/0.02)), transparent 50%);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+                border-radius: 1.5rem;
+            }
+
+            .specialty-card:hover::after {
+                opacity: 1;
+            }
+
+        /* تنسيقات إضافية للـ CTA */
+        .cta-glass {
+            background: var(--fallback-p, oklch(var(--p)));
+            color: var(--fallback-pc, oklch(var(--pc)));
+            border-radius: 2rem;
+            padding: 2.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .cta-glass .bg-blob {
+                position: absolute;
+                border-radius: 50%;
+                filter: blur(80px);
+                opacity: 0.2;
+                pointer-events: none;
+            }
+
+            .cta-glass .bg-blob-1 {
+                width: 300px;
+                height: 300px;
+                top: -150px;
+                right: -150px;
+                background: white;
+            }
+
+            .cta-glass .bg-blob-2 {
+                width: 200px;
+                height: 200px;
+                bottom: -100px;
+                left: -100px;
+                background: white;
+            }
+
+        /* تحسين breadcrumbs */
+        .breadcrumbs-custom {
+            display: inline-flex;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            opacity: 0.5;
+            background: var(--fallback-b1, oklch(var(--b1)/0.5));
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            border: 1px solid var(--fallback-b2, oklch(var(--b2)/0.2));
+            backdrop-filter: blur(8px);
+        }
+
+            .breadcrumbs-custom a {
+                color: var(--fallback-p, oklch(var(--p)));
+                text-decoration: none;
+                transition: opacity 0.2s;
+            }
+
+                .breadcrumbs-custom a:hover {
+                    opacity: 0.7;
+                }
+
+            .breadcrumbs-custom .separator {
+                opacity: 0.3;
+            }
+    </style>
+}
+
+<div class="w-full">
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="pt-28 md:pt-32 pb-12 md:pb-16 bg-base-200/30 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 text-center reveal">
+            <!-- Breadcrumbs -->
+            <div class="flex justify-center mb-6">
+                <div class="breadcrumbs-custom">
+                    <a asp-controller="Home" asp-action="Index">Home</a>
+                    <span class="separator">/</span>
+                    <span class="opacity-70">Specialties</span>
+                </div>
+            </div>
+
+            <span class="inline-block text-primary font-bold text-sm tracking-widest uppercase bg-primary/10 px-4 py-1 rounded-full mb-4">
+                Explore Expertise
+            </span>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-4">
+                Clinical <br class="hidden sm:block" />
+                <span class="text-primary">Departments</span>
+            </h1>
+            <p class="text-lg md:text-xl opacity-60 max-w-2xl mx-auto">
+                Explore our range of medical expertise and find the specialist you need for your health journey.
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== SPECIALTIES GRID ==================== -->
+    <section class="py-12 md:py-16 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            @if (Model != null && Model.Any())
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8 reveal delay-200">
+                    @foreach (var specialty in Model)
+                    {
+                        <partial name="_SpecialtyCard" model="specialty" />
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-20 reveal">
+                    <div class="w-20 h-20 rounded-full bg-base-200 mx-auto flex items-center justify-center text-4xl opacity-30 mb-6">
+                        🏥
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">No specialties found</h3>
+                    <p class="text-base opacity-60">Please check back later as we expand our clinical departments.</p>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- ==================== STATS / CTA SECTION ==================== -->
+    <section class="py-16 md:py-24 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="cta-glass reveal">
+                <div class="bg-blob bg-blob-1"></div>
+                <div class="bg-blob bg-blob-2"></div>
+                
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                    <!-- النص -->
+                    <div class="space-y-6">
+                        <h2 class="text-4xl md:text-5xl font-black tracking-tight leading-tight">
+                            Can't find a <br class="hidden sm:block" />
+                            specific <span class="text-secondary">specialty</span>?
+                        </h2>
+                        <p class="text-lg opacity-80 leading-relaxed max-w-lg">
+                            Our clinical board is constantly expanding to cover more medical categories.
+                            Contact our support team for personalized guidance.
+                        </p>
+                        <div class="flex flex-wrap gap-4 pt-2">
+                            <a asp-controller="Home" asp-action="Contact" class="btn btn-secondary btn-lg rounded-2xl px-10 shadow-xl shadow-secondary/30 hover:shadow-secondary/50 transition-all">
+                                Contact Support
+                            </a>
+                            <a asp-controller="Home" asp-action="FAQ" class="btn btn-ghost btn-lg rounded-2xl px-10 text-primary-content hover:bg-white/10">
+                                View FAQ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- الإحصائيات -->
+                    <div class="grid grid-cols-2 gap-4 md:gap-6">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 text-center border border-white/10">
+                            <div class="text-4xl md:text-5xl font-black mb-1">24/7</div>
+                            <div class="text-xs font-bold uppercase tracking-widest opacity-70">Emergency Routing</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 text-center border border-white/10">
+                            <div class="text-4xl md:text-5xl font-black mb-1">100%</div>
+                            <div class="text-xs font-bold uppercase tracking-widest opacity-70">Verified Board</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 text-center border border-white/10">
+                            <div class="text-4xl md:text-5xl font-black mb-1">500+</div>
+                            <div class="text-xs font-bold uppercase tracking-widest opacity-70">Specialists</div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 md:p-8 text-center border border-white/10">
+                            <div class="text-4xl md:text-5xl font-black mb-1">4.9★</div>
+                            <div class="text-xs font-bold uppercase tracking-widest opacity-70">Patient Rating</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== CTA: Join Us (Optional) ==================== -->
+    <section class="py-12 md:py-16 w-full bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5">
+        <div class="max-w-4xl mx-auto px-4 md:px-8 text-center reveal">
+            <h3 class="text-2xl md:text-3xl font-black">Ready to book an appointment?</h3>
+            <p class="text-base opacity-60 max-w-xl mx-auto mt-2">
+                Browse our specialists and schedule your consultation today.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 mt-6">
+                <a asp-controller="DoctorsUI" asp-action="Index" class="btn btn-primary btn-lg rounded-2xl px-12 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all">
+                    Find a Doctor
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline btn-lg rounded-2xl px-12">
+                    Back to Home
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>

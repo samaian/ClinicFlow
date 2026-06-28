@@ -1,0 +1,155 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Contact Support";
+}
+
+@section Styles {
+    <style>
+        /* إلغاء padding الـ main */
+        main.container {
+            max-width: 100% !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* إلغاء margin-top الزائد من الفوتر */
+        footer {
+            margin-top: 0 !important;
+        }
+
+        /* منع التمرير الأفقي */
+        body {
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100% !important;
+        }
+
+        /* تنسيق خاص للبطاقات */
+        .contact-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+            .contact-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 20px 40px -12px rgba(0,0,0,0.15);
+            }
+    </style>
+}
+
+<div class="w-full">
+
+    <!-- Hero Section: عنوان الصفحة -->
+    <section class="pt-28 md:pt-32 pb-16 md:pb-20 lg:pb-24 bg-base-200/30 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 text-center reveal">
+            <span class="inline-block text-primary font-bold text-sm tracking-widest uppercase bg-primary/10 px-4 py-1 rounded-full mb-4">Get in Touch</span>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tighter mb-4">How can we help?</h1>
+            <p class="text-lg md:text-xl opacity-60 max-w-2xl mx-auto">
+                Our support team is available 24/7 to assist with your medical booking needs.
+            </p>
+        </div>
+    </section>
+
+    <!-- المحتوى الرئيسي: معلومات التواصل + الفورم -->
+    <section class="py-16 md:py-24 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+                
+                <!-- الجهة اليسرى: معلومات التواصل -->
+                <div class="space-y-10 reveal">
+                    <!-- بطاقات التواصل -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <!-- Email -->
+                        <div class="card bg-base-100 p-8 rounded-3xl shadow-sm border border-base-200 contact-card">
+                            <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-5">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-1">Email Support</h3>
+                            <p class="text-sm opacity-60">support@clinicflow.com</p>
+                        </div>
+                        <!-- Office -->
+                        <div class="card bg-base-100 p-8 rounded-3xl shadow-sm border border-base-200 contact-card">
+                            <div class="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center text-secondary mb-5">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <h3 class="font-bold text-lg mb-1">Our Office</h3>
+                            <p class="text-sm opacity-60">123 Medical Plaza, London, UK</p>
+                        </div>
+                    </div>
+
+                    <!-- بطاقة الـ FAQ المميزة -->
+                    <div class="card bg-primary text-primary-content p-8 md:p-10 rounded-3xl shadow-xl relative overflow-hidden contact-card">
+                        <div class="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full -mb-20 -mr-20 blur-2xl"></div>
+                        <div class="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-full -mt-12 -ml-12 blur-xl"></div>
+                        <div class="relative z-10">
+                            <h3 class="text-2xl font-black mb-3">📖 Patient FAQ</h3>
+                            <p class="opacity-80 mb-6 leading-relaxed">
+                                Most questions about booking, payments, and account management can be answered instantly in our help center.
+                            </p>
+                            <a asp-action="FAQ" class="btn btn-secondary btn-lg rounded-2xl px-10 shadow-lg shadow-secondary/20 hover:shadow-secondary/40 transition-all">
+                                Visit Help Center
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الجهة اليمنى: الفورم -->
+                <div class="card bg-base-100 shadow-xl rounded-3xl p-8 md:p-12 border border-base-200 reveal delay-200">
+                    <h2 class="text-2xl font-black mb-6">Send us a message</h2>
+                    <form class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div class="form-control">
+                                <label class="label pb-1"><span class="label-text font-semibold opacity-70">Full Name</span></label>
+                                <input type="text" placeholder="John Doe" class="input input-bordered rounded-xl h-12 bg-base-200/50 border-none focus:bg-base-100 focus:border-primary transition" />
+                            </div>
+                            <div class="form-control">
+                                <label class="label pb-1"><span class="label-text font-semibold opacity-70">Email Address</span></label>
+                                <input type="email" placeholder="john@example.com" class="input input-bordered rounded-xl h-12 bg-base-200/50 border-none focus:bg-base-100 focus:border-primary transition" />
+                            </div>
+                        </div>
+                        <div class="form-control">
+                            <label class="label pb-1"><span class="label-text font-semibold opacity-70">Subject</span></label>
+                            <select class="select select-bordered rounded-xl h-12 bg-base-200/50 border-none focus:bg-base-100 focus:border-primary transition">
+                                <option>Booking Issue</option>
+                                <option>Payment Query</option>
+                                <option>Technical Support</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-control">
+                            <label class="label pb-1"><span class="label-text font-semibold opacity-70">Message</span></label>
+                            <textarea rows="4" placeholder="How can we help you?" class="textarea textarea-bordered rounded-xl bg-base-200/50 border-none focus:bg-base-100 focus:border-primary transition"></textarea>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-block rounded-2xl h-14 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all mt-2">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- خريطة أو معلومات إضافية (اختياري) -->
+    <section class="py-16 md:py-24 bg-base-200/30 w-full">
+        <div class="max-w-7xl mx-auto px-4 md:px-8 text-center reveal">
+            <h2 class="text-3xl md:text-4xl font-black mb-4">Visit Our Clinic</h2>
+            <p class="text-base md:text-lg opacity-60 max-w-2xl mx-auto mb-8">
+                We're conveniently located in the heart of London's medical district.
+            </p>
+            <div class="rounded-3xl overflow-hidden shadow-2xl border border-base-200 max-w-4xl mx-auto">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2483.6815620821716!2d-0.1557825!3d51.500729!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x487604c7d7d9b8b7%3A0x6e6a0a7d5a8f0e1b!2sHarley%20Street%2C%20London!5e0!3m2!1sen!2suk!4v1700000000000!5m2!1sen!2suk"
+                        width="100%"
+                        height="300"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </section>
+
+</div>

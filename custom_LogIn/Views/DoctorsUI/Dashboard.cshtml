@@ -1,0 +1,295 @@
+﻿@model Clinic_System.DoctorDashboardDto
+@using Clinic_System
+@{
+    Layout = "_DoctorLayout";
+    ViewData["Title"] = "Dashboard";
+    var hour = DateTime.UtcNow.Hour;
+    var greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+}
+
+@section Styles {
+    <style>
+        .kpi-card {
+            border-radius: 1.1rem;
+            padding: 1.1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .85rem;
+            border: 1px solid rgba(255,255,255,.2);
+            transition: transform .2s ease, box-shadow .2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .kpi-card::after {
+                content: '';
+                position: absolute;
+                top: -30%;
+                right: -10%;
+                width: 90px;
+                height: 90px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.07);
+            }
+
+            .kpi-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 24px -8px rgba(0,0,0,.18);
+            }
+
+        .kpi-value {
+            font-size: 1.6rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .kpi-label {
+            font-size: .65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            opacity: .75;
+            margin-top: .15rem;
+        }
+
+        .section-card {
+            background: rgba(255,255,255,.55);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 1.1rem;
+            padding: 1.1rem 1.25rem;
+        }
+
+        [data-theme="night"] .section-card,
+        [data-theme="dracula"] .section-card {
+            background: rgba(17,24,39,.45);
+            border-color: rgba(255,255,255,.08);
+        }
+
+        .section-heading {
+            font-size: .88rem;
+            font-weight: 700;
+            margin-bottom: .9rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            padding-bottom: .6rem;
+            border-bottom: 1px solid rgba(0,0,0,.06);
+        }
+
+        [data-theme="night"] .section-heading,
+        [data-theme="dracula"] .section-heading {
+            border-bottom-color: rgba(255,255,255,.06);
+        }
+
+        .ldot {
+            width: 7px;
+            height: 7px;
+            border-radius: 9999px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .apt-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .apt-table th {
+                font-size: .6rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                opacity: .4;
+                padding: 0 .4rem .5rem;
+                text-align: left;
+            }
+
+            .apt-table td {
+                font-size: .83rem;
+                padding: .5rem .4rem;
+                vertical-align: middle;
+            }
+
+            .apt-table tbody tr {
+                border-top: 1px solid rgba(0,0,0,.04);
+                transition: background .1s;
+            }
+
+                .apt-table tbody tr:hover {
+                    background: oklch(var(--b2)/.4);
+                }
+
+        [data-theme="night"] .apt-table tbody tr,
+        [data-theme="dracula"] .apt-table tbody tr {
+            border-top-color: rgba(255,255,255,.04);
+        }
+
+        .star-filled {
+            color: #f59e0b;
+        }
+
+        .star-empty {
+            color: #d1d5db;
+        }
+    </style>
+}
+
+<div class="space-y-5">
+
+    @* Header *@
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h1 class="text-xl font-black tracking-tight">
+                @greeting, <span class="text-primary">Dr. @Model.FullName.Split(" ")[0]</span> 👋
+            </h1>
+            <p class="text-xs opacity-40 mt-0.5">@Model.Specialization · @DateTime.UtcNow.ToString("dddd, MMMM dd yyyy")</p>
+        </div>
+        <a asp-controller="ScheduleUI" asp-action="Create"
+           class="btn btn-primary btn-sm rounded-full px-5 shadow shadow-primary/20 text-xs">
+            + Add Schedule Slot
+        </a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-error rounded-xl text-sm border-0">⚠️ @TempData["Error"]</div>
+    }
+
+    @* KPI row *@
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="kpi-card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+            <span class="text-3xl">📅</span>
+            <div><div class="kpi-value">@Model.TotalAppointments</div><div class="kpi-label">Appointments</div></div>
+        </div>
+        <div class="kpi-card bg-gradient-to-br from-violet-500 to-violet-700 text-white">
+            <span class="text-3xl">🧑‍⚕️</span>
+            <div><div class="kpi-value">@Model.TotalPatients</div><div class="kpi-label">Patients</div></div>
+        </div>
+        <div class="kpi-card bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+            <span class="text-3xl">💰</span>
+            <div><div class="kpi-value">$@Model.TotalRevenue.ToString("N0")</div><div class="kpi-label">Revenue</div></div>
+        </div>
+        <div class="kpi-card bg-gradient-to-br from-amber-400 to-orange-500 text-white">
+            <span class="text-3xl">⭐</span>
+            <div><div class="kpi-value">@Model.AverageRating.ToString("0.0")</div><div class="kpi-label">Avg Rating</div></div>
+        </div>
+    </div>
+
+    @* Status breakdown + Recent Reviews *@
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        @* Appointment status breakdown *@
+        <div class="section-card">
+            <div class="section-heading">📊 Appointment Status</div>
+            @{
+                double safeTotal = Model.TotalAppointments > 0 ? (double)Model.TotalAppointments : 1;
+                var statRows = new[]
+                {
+                        new { Label="Pending",   Count=Model.PendingAppointments,   Dot="bg-amber-400",  Bar="bg-amber-400"  },
+                        new { Label="Confirmed", Count=Model.ConfirmedAppointments, Dot="bg-green-500",  Bar="bg-green-500"  },
+                        new { Label="Completed", Count=Model.CompletedAppointments, Dot="bg-sky-400",    Bar="bg-sky-400"    },
+                        new { Label="Cancelled", Count=Model.CancelledAppointments, Dot="bg-red-400",    Bar="bg-red-400"    },
+                        };
+            }
+            <div class="space-y-3">
+                @foreach (var row in statRows)
+                {
+                    var pct = row.Count / safeTotal * 100;
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="flex items-center gap-2">
+                                <span class="ldot @row.Dot"></span>@row.Label
+                            </span>
+                            <span class="font-bold">@row.Count</span>
+                        </div>
+                        <div class="w-full bg-base-200 rounded-full h-1.5">
+                            <div class="@row.Bar h-1.5 rounded-full transition-all duration-700"
+                                 style="width:@pct.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* Recent Reviews *@
+        <div class="section-card">
+            <div class="section-heading">💬 Recent Reviews <span class="text-xs font-normal opacity-40 ml-1">(@Model.ReviewsCount total)</span></div>
+            @if (!Model.RecentReviews.Any())
+            {
+                <div class="text-center py-8 opacity-30 text-sm">No reviews yet.</div>
+            }
+            else
+            {
+                <div class="space-y-3">
+                    @foreach (var r in Model.RecentReviews)
+                    {
+                        <div class="p-3 rounded-xl bg-base-200/50">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="font-semibold text-sm">@r.PatientName</span>
+                                <span class="text-xs opacity-40">@r.CreatedAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+                            <div class="flex gap-0.5 mb-1">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="text-sm @(i <= r.Rating ? "star-filled" : "star-empty")">★</span>
+                                }
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(r.Comment))
+                            {
+                                <p class="text-xs opacity-60 leading-relaxed">@r.Comment</p>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    @* Recent Appointments *@
+    <div class="section-card">
+        <div class="section-heading">📋 Recent Appointments</div>
+        @if (!Model.RecentAppointments.Any())
+        {
+            <div class="text-center py-10 opacity-30">
+                <div class="text-4xl mb-2">📭</div>
+                <p class="text-sm">No appointments yet.</p>
+            </div>
+        }
+        else
+        {
+            <table class="apt-table">
+                <thead>
+                    <tr><th>#</th><th>Patient</th><th>Date</th><th>Status</th><th class="text-center">Paid</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model.RecentAppointments)
+                    {
+                        var (badge, label) = a.Status switch
+                        {
+                            AppointmentStatus.Confirmed => ("badge-success", "Confirmed"),
+                            AppointmentStatus.Pending => ("badge-warning", "Pending"),
+                            AppointmentStatus.Completed => ("badge-info", "Completed"),
+                            AppointmentStatus.Canceled => ("badge-error", "Cancelled"),
+                            _ => ("badge-ghost", a.Status.ToString())
+                        };
+                        <tr>
+                            <td class="font-mono text-xs opacity-25">#@a.Id</td>
+                            <td class="font-semibold">@a.PatientName</td>
+                            <td class="opacity-50 text-xs">@a.Date.ToString("MMM dd, yyyy")</td>
+                            <td><span class="badge @badge badge-sm font-semibold">@label</span></td>
+                            <td class="text-center">@(a.IsPaid ? "✅" : Html.Raw("<span class='opacity-20'>⏳</span>"))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="mt-3 text-right">
+                <a asp-controller="AppointmentUI" asp-action="DoctorAppointments"
+                   class="text-xs text-primary hover:underline font-semibold">
+                    View all appointments →
+                </a>
+            </div>
+        }
+    </div>
+
+</div>

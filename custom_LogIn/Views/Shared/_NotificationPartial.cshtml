@@ -1,0 +1,42 @@
+﻿<!-- استدعاء مكتبة SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // إعداد الـ Toast ليكون إشعار جانبي يختفي تلقائياً
+    const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-start', // سيظهر في أعلى اليمين (مناسب للمواقع بالعربي)
+    showConfirmButton: false, // إخفاء زر "موافق"
+    timer: 3000, // الإشعار سيختفي بعد 3 ثواني
+    timerProgressBar: true, // شريط تحميل يوضح وقت اختفاء الإشعار
+    didOpen: (toast) => {
+    // إيقاف المؤقت إذا وضع المستخدم الماوس على الإشعار
+    toast.addEventListener('mouseenter', Swal.stopTimer)
+    toast.addEventListener('mouseleave', Swal.resumeTimer)
+    }
+    });
+</script>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        Toast.fire({
+        icon: 'success',
+        title: '@TempData["SuccessMessage"]'
+        });
+        });
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        Toast.fire({
+        icon: 'error',
+        title: '@TempData["ErrorMessage"]'
+        });
+        });
+    </script>
+}

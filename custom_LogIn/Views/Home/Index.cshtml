@@ -1,0 +1,492 @@
+﻿
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Find Your Ideal Doctor";
+    // var featuredDoctors = ViewData["FeaturedDoctors"] as List<DoctorDto> ?? new List<DoctorDto>();
+    var specialties = ViewData["Specialties"] as List<SpecialtyDto> ?? new List<SpecialtyDto>();
+}
+
+@section Styles {
+<style>
+    html, body {
+        overflow-x: hidden;
+    }
+
+    /* ========================= */
+    /* Gradient Text Animation */
+    /* ========================= */
+    @@keyframes gradient-x {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .animate-gradient-x {
+        background-size: 200% 200%;
+        animation: gradient-x 4s ease-in-out infinite;
+    }
+
+    /* ========================= */
+    /* Reveal Animation (Improved) */
+    /* ========================= */
+    .reveal {
+        opacity: 0;
+        transform: translateY(50px) scale(0.98);
+        filter: blur(6px);
+        transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        will-change: transform, opacity, filter;
+    }
+
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+
+    .reveal.delay-100 { transition-delay: 0.1s; }
+    .reveal.delay-200 { transition-delay: 0.2s; }
+    .reveal.delay-300 { transition-delay: 0.3s; }
+    .reveal.delay-400 { transition-delay: 0.4s; }
+    .reveal.delay-500 { transition-delay: 0.5s; }
+
+    /* ========================= */
+    /* Floating Animations */
+    /* ========================= */
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-12px); }
+    }
+
+    .animate-float {
+        animation: float 5s ease-in-out infinite;
+    }
+
+    @@keyframes float-slow {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .animate-float-slow {
+        animation: float-slow 7s ease-in-out infinite;
+    }
+
+    /* ========================= */
+    /* Glow Pulse (for hero image) */
+    /* ========================= */
+    @@keyframes glow {
+        0%, 100% {
+            opacity: 0.4;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.7;
+            transform: scale(1.1);
+        }
+    }
+
+    .animate-glow {
+        animation: glow 6s ease-in-out infinite;
+    }
+
+    /* ========================= */
+    /* Smooth page feel */
+    /* ========================= */
+    * {
+        scroll-behavior: smooth;
+    }
+    
+ 
+</style>
+}
+
+<!-- ============================================================ -->
+@* /* HERO SECTION – العناصر تحت الصورة، إطار أبيض                 */ *@
+<!-- ============================================================ -->
+<section class="relative left-1/2 -translate-x-1/2 w-screen min-h-[90vh] flex items-center overflow-hidden -mt-24 md:-mt-28 pt-24 md:pt-28 pb-16 md:pb-20"
+         style="background: linear-gradient(170deg, var(--fallback-p,oklch(var(--p)/0.10)) 0%, var(--fallback-b1,oklch(var(--b1)/1)) 50%, var(--fallback-b1,oklch(var(--b1)/1)) 100%);">
+
+    <!-- الخلفية -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute top-[-15%] right-[-5%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[130px]"></div>
+        <div class="absolute bottom-[-15%] left-[-5%] w-[35%] h-[35%] bg-secondary/15 rounded-full blur-[110px]"></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-color-primary)_1px,_transparent_1px)] bg-[length:36px_36px] opacity-[0.05] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center relative z-10 w-full">
+
+        <!-- ========================================= -->
+        <!-- العمود الأيمن: النصوص                       -->
+        <!-- ========================================= -->
+        <div class="space-y-8">
+
+            <!-- الشارة -->
+            <div class="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/15 text-primary text-sm font-semibold backdrop-blur-sm shadow-sm">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+                </span>
+                🏥 Trusted Healthcare Platform
+            </div>
+
+            <!-- العنوان -->
+            <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tight">
+                Your Health, <br />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-gradient-x">
+                    Our Priority
+                </span>
+            </h1>
+
+            <!-- الوصف -->
+            <p class="text-lg md:text-xl text-base-content/70 max-w-lg leading-relaxed">
+                Book appointments with top doctors instantly. Secure, fast, and hassle-free — because your time matters.
+            </p>
+
+            <!-- الأزرار -->
+            <div class="flex flex-wrap items-center gap-4 pt-2">
+                <a href="#search" class="btn btn-primary btn-lg rounded-2xl px-10 shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all duration-300 hover:-translate-y-1">
+                    Find a Doctor
+                    <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                <a asp-controller="Home" asp-action="About" class="btn btn-ghost btn-lg rounded-2xl px-8 gap-2 text-base font-semibold hover:bg-base-200/80 transition-colors">
+                    <svg class="w-8 h-8 p-1.5 rounded-full bg-primary/10 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    Learn More
+                </a>
+            </div>
+
+            <!-- الإحصائيات + التقييم (4.5) -->
+            <div class="flex flex-wrap items-center gap-6 pt-6 border-t border-base-300/40">
+                <div class="flex -space-x-2 rtl:space-x-reverse">
+                    <div class="w-10 h-10 rounded-full ring-2 ring-base-100 bg-base-300 flex items-center justify-center font-bold text-xs">JD</div>
+                    <div class="w-10 h-10 rounded-full ring-2 ring-base-100 bg-base-300 flex items-center justify-center font-bold text-xs">MK</div>
+                    <div class="w-10 h-10 rounded-full ring-2 ring-base-100 bg-base-300 flex items-center justify-center font-bold text-xs">SR</div>
+                    <div class="w-10 h-10 rounded-full ring-2 ring-base-100 bg-primary text-primary-content flex items-center justify-center font-bold text-xs">+5k</div>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-1">
+                        <span class="text-sm font-bold mr-1">4.5</span>
+                        <div class="rating rating-sm rating-half">
+                            <input type="radio" class="mask mask-star-2 mask-half-1 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-2 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-1 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-2 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-1 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-2 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-1 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-2 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-1 bg-orange-400" checked disabled />
+                            <input type="radio" class="mask mask-star-2 mask-half-2 bg-transparent" checked disabled />
+                        </div>
+                    </div>
+                    <span class="text-xs opacity-60 font-medium">Based on 2,400+ reviews</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- العمود الأيسر: الصورة + العناصر تحت       -->
+        <!-- ========================================= -->
+        <div class="relative flex flex-col items-center justify-center">
+
+            <div class="relative w-full max-w-sm md:max-w-md lg:max-w-lg">
+
+                <!-- ========================================= -->
+                <!-- إطار الصورة الجديد (أبيض)                  -->
+                <!-- ========================================= -->
+<div class="relative z-10 group">
+
+    <!-- Glow background -->
+    <div class="absolute -inset-10 bg-primary/10 blur-3xl rounded-full opacity-60 
+                group-hover:opacity-80 transition duration-700"></div>
+
+    <!-- Floating animation wrapper -->
+    <div class="relative animate-float-slow">
+
+        <!-- White frame -->
+        <div class="p-[4px] rounded-3xl bg-white shadow-2xl shadow-gray-300/40
+                    transition-all duration-700
+                    group-hover:-translate-y-2 group-hover:shadow-gray-400/50">
+
+            <!-- Image container -->
+            <div class="rounded-3xl overflow-hidden bg-white">
+
+                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=800"
+                     class="w-full h-[280px] md:h-[360px] lg:h-[420px] object-cover
+                            transition-transform duration-700 group-hover:scale-105"
+                     alt="Modern Healthcare" />
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+                <!-- ========================================= -->
+                <!-- العناصر تحت الصورة (في صف واحد)          -->
+                <!-- ========================================= -->
+                <div class="relative z-10 flex flex-col sm:flex-row gap-4 justify-center mt-6 md:mt-8">
+
+                    <!-- العنصر 1: "Excellent Rating" (يسار) -->
+                    <div class="glass-card px-5 py-3 md:px-6 md:py-4 rounded-2xl shadow-xl 
+                                border border-base-200/50 backdrop-blur-xl
+                                flex items-center gap-3 md:gap-4 flex-1 justify-center">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl md:text-2xl">
+                            ⭐
+                        </div>
+                        <div>
+                            <p class="font-black text-sm md:text-base">Excellent</p>
+                            <p class="text-[10px] md:text-xs opacity-60 font-medium">Rating 4.9/5</p>
+                        </div>
+                    </div>
+
+                    <!-- العنصر 2: "Available Today" (يمين) -->
+                    <div class="glass-card px-5 py-3 md:px-6 md:py-4 rounded-2xl shadow-xl 
+                                border border-base-200/50 backdrop-blur-xl
+                                flex items-center gap-3 md:gap-4 flex-1 justify-center">
+                        <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-success/10 flex items-center justify-center text-success text-xl md:text-2xl">
+                            ✅
+                        </div>
+                        <div>
+                            <p class="font-black text-sm md:text-base">Available Today</p>
+                            <p class="text-[10px] md:text-xs opacity-60 font-medium">12+ slots free</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- ==================== SEARCH SECTION ==================== -->
+<section class="pt-28 md:pt-32 pb-16 md:pb-20 w-full bg-base-100">
+    <div class="max-w-4xl mx-auto px-4 md:px-8 reveal">
+        <div class="text-center mb-12 md:mb-16">
+            <span class="inline-block text-primary font-bold text-sm tracking-widest uppercase bg-primary/10 px-4 py-1 rounded-full mb-4">Find Your Doctor</span>
+            <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-4">Discover the Right Specialist</h2>
+            <p class="text-base md:text-lg text-base-content/60 max-w-2xl mx-auto">
+                Search by name, specialty, or budget to find your perfect match.
+            </p>
+        </div>
+
+        <form asp-controller="DoctorsUI" asp-action="Index" method="get" 
+              class="search-glass p-3 md:p-4 rounded-3xl shadow-xl flex flex-col md:flex-row gap-3 md:gap-4 border border-base-200/50">
+            
+            <!-- حقل البحث بالاسم -->
+            <div class="flex-1 relative">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none opacity-40">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                <input name="name" type="text" placeholder="Search doctor by name..." 
+                       class="input input-lg w-full pl-12 rounded-2xl bg-base-100/50 border-0 focus:ring-2 focus:ring-primary/30 text-base placeholder:opacity-50" />
+            </div>
+
+            <!-- فاصل عمودي -->
+            <div class="hidden md:block w-px h-10 bg-base-300/50 self-center"></div>
+
+            <!-- حقل التخصص -->
+            <div class="flex-1">
+                <select name="specialty" class="select select-lg w-full rounded-2xl bg-base-100/50 border-0 focus:ring-2 focus:ring-primary/30 text-base">
+                    <option value="">All Specialties</option>
+                    @foreach(var s in specialties) {
+                        <option value="@s.Name">@s.Name</option>
+                    }
+                </select>
+            </div>
+
+            <!-- زر البحث -->
+            <button type="submit" class="btn btn-primary btn-lg rounded-2xl px-8 md:px-12 h-14 shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                Search
+            </button>
+        </form>
+
+        <!-- إحصائيات سريعة تحت البحث -->
+        <div class="flex flex-wrap justify-center gap-6 md:gap-10 mt-8 text-sm opacity-60">
+            <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                500+ Verified Specialists
+            </span>
+            <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-secondary"></span>
+                30+ Medical Specialties
+            </span>
+            <span class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-accent"></span>
+                98% Patient Satisfaction
+            </span>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- ==================== FEATURED DOCTORS ==================== -->
+<section class="py-20 md:py-28 w-full bg-base-200/30">
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16 reveal">
+            <div class="max-w-2xl">
+                <span class="inline-block text-primary font-bold text-sm tracking-widest uppercase bg-primary/10 px-4 py-1 rounded-full mb-4">Top Rated</span>
+                <h2 class="text-4xl md:text-5xl font-black tracking-tight mb-4">Top Rated Specialists</h2>
+                <p class="text-base md:text-lg text-base-content/60">
+                    Hand-picked professionals with a proven track record of clinical excellence.
+                </p>
+            </div>
+            <a asp-controller="DoctorsUI" asp-action="Index" 
+               class="btn btn-outline btn-lg rounded-2xl px-10 shadow-sm hover:shadow-lg transition-all whitespace-nowrap">
+                View All Doctors
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 reveal delay-200">
+            @* @foreach(var doctor in featuredDoctors)
+            {
+                <partial name="_DoctorCard" model="doctor" />
+            } *@
+        </div>
+
+        <!-- زر إضافي للهواتف (اختياري) -->
+        <div class="text-center mt-12 md:hidden">
+            <a asp-controller="DoctorsUI" asp-action="Index" class="btn btn-primary btn-lg rounded-2xl px-12 w-full shadow-lg shadow-primary/20">
+                Browse All Doctors
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<!-- ============================================================ -->
+@* /* SPECIALTIES – Inside Container (Full-width Cards) */ *@
+<!-- ============================================================ -->
+<section class="py-24 bg-base-100">
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">Browse by Specialty</h2>
+            <p class="text-lg text-base-content/60 max-w-2xl mx-auto">Focused expertise for every medical need. Discover the right department for your journey.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 reveal delay-200">
+            @foreach(var specialty in specialties)
+            {
+                <partial name="_SpecialtyCard" model="specialty" />
+            }
+        </div>
+        
+        <div class="mt-12 text-center reveal delay-400">
+            <a asp-controller="SpecialtiesUI" asp-action="Index" class="btn btn-ghost btn-lg rounded-2xl gap-2 font-bold hover:bg-base-200/60 transition-all">
+                View All Medical Departments
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+@* /* HOW IT WORKS – Full Width with Brand Color */ *@
+<!-- ============================================================ -->
+<section class="relative left-1/2 -translate-x-1/2 w-screen py-24 bg-primary text-primary-content overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48 blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-40 -mb-40 blur-3xl"></div>
+    
+    <div class="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+        <div class="text-center mb-16 reveal">
+            <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">Seamless Booking Experience</h2>
+            <p class="text-lg md:text-xl opacity-80 max-w-2xl mx-auto">Your journey to better health starts here. Simple, secure, and stress-free.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+            <div class="flex flex-col items-center text-center space-y-4 reveal delay-100">
+                <div class="w-20 h-20 rounded-2xl bg-white/15 flex items-center justify-center text-4xl font-black backdrop-blur-sm shadow-lg">01</div>
+                <h3 class="text-2xl font-bold">Find Your Expert</h3>
+                <p class="opacity-75 leading-relaxed max-w-xs">Search through hundreds of verified specialists by specialty, name, or rating.</p>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-4 reveal delay-300">
+                <div class="w-20 h-20 rounded-2xl bg-white/15 flex items-center justify-center text-4xl font-black backdrop-blur-sm shadow-lg">02</div>
+                <h3 class="text-2xl font-bold">Choose Your Slot</h3>
+                <p class="opacity-75 leading-relaxed max-w-xs">Pick a date and time that fits your schedule perfectly with real-time availability.</p>
+            </div>
+            <div class="flex flex-col items-center text-center space-y-4 reveal delay-500">
+                <div class="w-20 h-20 rounded-2xl bg-white/15 flex items-center justify-center text-4xl font-black backdrop-blur-sm shadow-lg">03</div>
+                <h3 class="text-2xl font-bold">Confirm &amp; Pay</h3>
+                <p class="opacity-75 leading-relaxed max-w-xs">Securely pay online and receive instant confirmation via email and portal.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+@* /* STATS SECTION – Inside Container */ *@
+<!-- ============================================================ -->
+<section class="py-24 bg-base-100">
+    <div class="max-w-7xl mx-auto px-4 md:px-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 reveal">
+            <div class="text-center space-y-2 p-6 rounded-2xl bg-base-200/30 hover:bg-base-200/50 transition-all hover:scale-[1.02]">
+                <div class="text-4xl md:text-5xl font-black text-primary">150k+</div>
+                <div class="text-xs font-bold uppercase tracking-[0.2em] opacity-50">Appointments</div>
+            </div>
+            <div class="text-center space-y-2 p-6 rounded-2xl bg-base-200/30 hover:bg-base-200/50 transition-all hover:scale-[1.02]">
+                <div class="text-4xl md:text-5xl font-black text-secondary">480+</div>
+                <div class="text-xs font-bold uppercase tracking-[0.2em] opacity-50">Specialists</div>
+            </div>
+            <div class="text-center space-y-2 p-6 rounded-2xl bg-base-200/30 hover:bg-base-200/50 transition-all hover:scale-[1.02]">
+                <div class="text-4xl md:text-5xl font-black text-accent">98.5%</div>
+                <div class="text-xs font-bold uppercase tracking-[0.2em] opacity-50">Satisfaction</div>
+            </div>
+            <div class="text-center space-y-2 p-6 rounded-2xl bg-base-200/30 hover:bg-base-200/50 transition-all hover:scale-[1.02]">
+                <div class="text-4xl md:text-5xl font-black">12+</div>
+                <div class="text-xs font-bold uppercase tracking-[0.2em] opacity-50">Countries</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+@* /* FINAL CTA – Full Width */ *@
+<!-- ============================================================ -->
+<section class="relative left-1/2 -translate-x-1/2 w-screen py-24 px-4 bg-gradient-to-br from-base-100 via-base-200/30 to-primary/5">
+    <div class="max-w-5xl mx-auto bg-base-200/60 backdrop-blur-xl rounded-[3rem] p-10 md:p-16 lg:p-20 text-center space-y-8 border border-base-200/40 shadow-2xl reveal">
+        <h2 class="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[1.1]">
+            Ready to start your <br class="hidden sm:block" />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">healthy journey?</span>
+        </h2>
+        <p class="text-lg md:text-xl text-base-content/60 max-w-2xl mx-auto">Join thousands of patients who trust ClinicFlow for their daily healthcare needs.</p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <a asp-controller="Account" asp-action="Register" class="btn btn-primary btn-lg rounded-2xl px-10 md:px-14 h-16 shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all hover:-translate-y-1">
+                Create Your Account
+                <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+            <a asp-controller="DoctorsUI" asp-action="Index" class="btn btn-outline btn-lg rounded-2xl px-10 md:px-14 h-16 hover:scale-[1.02] transition-all">
+                Browse Specialists
+            </a>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // تأثير الظهور عند التمرير (Reveal on Scroll)
+        document.addEventListener('DOMContentLoaded', function() {
+            const revealElements = document.querySelectorAll('.reveal');
+            
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+        });
+    </script>
+}
