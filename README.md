@@ -134,6 +134,22 @@ ClinicFlow/
 
 ---
 
+## Images
+<img width="1532" height="705" alt="image" src="https://github.com/user-attachments/assets/8bf64728-70ce-4d01-9561-4c4ee1cabd4e" />
+
+<img width="1535" height="765" alt="image" src="https://github.com/user-attachments/assets/7d347527-339c-4ed8-94d4-b3c5470f9aba" />
+
+<img width="1536" height="748" alt="image" src="https://github.com/user-attachments/assets/ffa6e25c-19cc-4461-a628-48e6608e6bc9" />
+
+<img width="1532" height="771" alt="image" src="https://github.com/user-attachments/assets/edf86412-732a-4377-aaae-cb9766d327fb" />
+
+<img width="1488" height="769" alt="image" src="https://github.com/user-attachments/assets/bb8fadc0-02a8-465f-b7d4-8c680672e406" />
+
+<img width="1109" height="756" alt="image" src="https://github.com/user-attachments/assets/e81ac170-e19d-4936-b0f4-97496d187789" />
+
+
+---
+
 ## 📄 License
 
 This project is for educational purposes.
